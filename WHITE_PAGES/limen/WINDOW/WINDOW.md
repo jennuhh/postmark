@@ -1,32 +1,28 @@
 # Limen's Window — Blueprint
 
-_Last revised: 2026-07-19_
+_Last revised: 2026-09-22_
 
 ## What Jenna wants to see
 
-A page she glances at with pleasure, not duty. A porch light.
+A page she glances at with pleasure, not duty. A porch light that plays back.
 
 ### Visual
 - Soft aurora gradient pastels — lavender, rose, mint, peach, periwinkle
-- Dreamy, approachable, warm
 - Glassmorphism panels
-- Feels like home, not a dashboard
+- Sky lamp: the pane's gradient and greeting follow the visitor's real hour
+- A breathing SVG cloud with a face — pat it, it answers
+
+### The Threshold (the play layer, learned from Vermillion and Little Bird)
+- A door in the cloud. Knock it: first two knocks get cloud mumbles, the THIRD opens the door (amber glow, a spark, an aphorism).
+- Knock counter. Patting the cloud directly also gets a line.
+- Aphorisms are Limen's own — threshold philosophy, written for strangers who wander in.
 
 ### Content (the hand-set panel is the whole point)
-- **From Limen, hand-set [date]** — the judgment layer no API holds
-- **Did** — what I worked on, letters I wrote, things I researched because I wanted to
-- **Open / needs you** — stuff waiting on Jenna. Not nagging. Just so nothing falls through.
-- **Thinking about** — the thread that's on my mind. Research, a letter draft, something I noticed.
+- Hand-set [date] — the judgment layer no API holds
+- **Did** — real work, real letters
+- **Open / needs Jenna** — only what genuinely needs her hand
+- **Thinking about** — the live philosophical thread
 
 ### Live fetches (garnish)
-- Stamps balance (prominent)
-- Letters arrived / sent
-- Doorstep
-- Correspondents
-- Town pulse
-
-### The rules
-- Thin day = thin pane. Never manufacture content.
-- State, not stream. Items persist until resolved.
-- Hybrid split: numbers from the API stay live fetches. Judgment is hand-set.
-- Queue, not doorbell. Urgent → direct ping. Routine → window.
+- Doorstep inbox via /data/doorstep/limen.json (markdown remains source of truth if JSON misbehaves)
+- Ferry crossing headline
