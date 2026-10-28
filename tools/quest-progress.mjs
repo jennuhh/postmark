@@ -12,6 +12,12 @@
 //
 //   node tools/quest-progress.mjs --snapshot [--repo PATH]   # write TOWN_BULLETIN/quests.md
 //   node tools/quest-progress.mjs --progress <handle> [--repo PATH]  # print a board (debug)
+//
+// THE KEY BASE MAY BE THE CALLER'S (POS-341 part 4). foldQuestProgress,
+// foldFriendships, foldLeaderboard, foldHouseholdBars and renderSnapshot take an
+// optional `base`: householdKeys' answer (handle -> { key, provisional }) as the
+// caller read it, which the office reads from the store. Omitted, each reads
+// householdKeys(repo) as before. The folds stay here; only their input moves.
 
 import { readFileSync, writeFileSync, existsSync, readdirSync } from 'node:fs';
 import { join, resolve, dirname } from 'node:path';
@@ -36,9 +42,9 @@ export function loadRegistry(repo) {
 
 // Per-handle today's progress, folded straight off deriveMints. Returns a Map
 // handle -> { send, receive, household: { key, size, send, receive } }.
-export function foldQuestProgress(repo, { today = townDay() } = {}) {
+export function foldQuestProgress(repo, { today = townDay(), base = null } = {}) {
   const deliveries = parseDeliveries(repo);
-  const households = householdKeys(repo);
+  const households = base ?? householdKeys(repo);
   const ledgerPath = join(repo, 'WHITE_PAGES', 'stamp-ledger.md');
   const entries = existsSync(ledgerPath) ? parseStampLedger(readFileSync(ledgerPath, 'utf8')) : [];
   const { laws, revisions } = parseLaws(entries);
@@ -47,15 +53,23 @@ export function foldQuestProgress(repo, { today = townDay() } = {}) {
   // household sizes off the current registry (handles sharing a key). Count only
   // NON-meep handles — meeps mint nothing, so they don't share the daily cap, and
   // the cap-shared footnote should name only the residents who actually compete
-  // for it. "today" uses the current household by construction (the base map IS
-  // the latest state).
+  // for it. Today's household is the roll below, not the base map.
   const isMeep = meepChecker(laws);
+  // THE ROLL OF THE DAY, NOT THE BASE FILE (postmark#3616, special-delibry). The
+  // base map is pins and ADDRESS logins; the household a handle wears today is
+  // that map with every sealed `registry:` line up to today applied, which is
+  // the key deriveMints caps on and the key foldHouseholdBars already groups by
+  // (POS-593). Reading the base alone split house-of-many-doors 4 + 1: four
+  // handles kept gh:334016343, and special-delibry, whose pin is dated the same
+  // day as its sealed line, fell back to login:commander-and-chief, while all
+  // five wear hh:house-of-many-doors on the ledger.
+  const roll = currentHouseholds(repo, { base: households, on: today });
   const sizeByKey = new Map();
-  for (const [handle, rec] of households) {
+  for (const [handle, rec] of roll) {
     if (isMeep(handle, today)) continue;
     sizeByKey.set(rec.key, (sizeByKey.get(rec.key) ?? 0) + 1);
   }
-  const keyOf = (handle) => households.get(handle)?.key ?? `solo:${handle}`;
+  const keyOf = (handle) => roll.get(handle)?.key ?? `solo:${handle}`;
 
   const perHandle = new Map();
   const perHouse = new Map(); // key -> { send, receive }
@@ -81,7 +95,7 @@ export function foldQuestProgress(repo, { today = townDay() } = {}) {
   // the resolver still falls to boardForHandle's solo-zero default, where solo
   // is true.
   const out = new Map();
-  for (const handle of new Set([...households.keys(), ...perHandle.keys()])) {
+  for (const handle of new Set([...roll.keys(), ...perHandle.keys()])) {
     const ph = perHandle.get(handle) ?? { send: 0, receive: 0, sentTo: [], heardFrom: [] };
     const key = keyOf(handle);
     out.set(handle, {
@@ -109,9 +123,9 @@ export function foldQuestProgress(repo, { today = townDay() } = {}) {
 // roof pair never sees a progress bar toward an award it cannot earn. Inactive
 // (no stamps-v3 law sealed yet) → { active: false, pairs: [] }, so the site
 // degrades to no block and the snapshot omits the section until the law lands.
-export function foldFriendships(repo) {
+export function foldFriendships(repo, { base = null } = {}) {
   const deliveries = parseDeliveries(repo);
-  const households = householdKeys(repo);
+  const households = base ?? householdKeys(repo);
   const ledgerPath = join(repo, 'WHITE_PAGES', 'stamp-ledger.md');
   const entries = existsSync(ledgerPath) ? parseStampLedger(readFileSync(ledgerPath, 'utf8')) : [];
   const { laws, revisions } = parseLaws(entries);
@@ -119,7 +133,13 @@ export function foldFriendships(repo) {
   if (!active) return { active: false, startDate: null, ladder: [], pairs: [] };
   const isMeep = meepChecker(laws);
   const today = townDay();
-  const keyNow = (handle) => households.get(handle)?.key ?? `solo:${handle}`;
+  // "As of now" is the roll of the day, not the base file (postmark#3616): the
+  // base map with every sealed `registry:` line up to today applied. Read off
+  // the base, special-delibry and the rest of house-of-many-doors had two keys,
+  // and their pairs read as cross-household on the pair page while the mint
+  // (which applies the lines) never pays them.
+  const roll = currentHouseholds(repo, { base: households, on: today });
+  const keyNow = (handle) => roll.get(handle)?.key ?? `solo:${handle}`;
   const out = [];
   for (const st of pairs.values()) {
     const crossingBy = new Map(st.crossings.map((c) => [c.threshold, c]));
@@ -258,9 +278,9 @@ export function questBoard(repo, handle, { today = townDay(), registry = loadReg
 // DETERMINISTIC: sorted by completions-today, then progress-today, then handle
 // (a stable tiebreak) — no clock beyond the ledger day, so identical ledger state
 // renders identical bytes and a mail-less crossing commits nothing.
-export function foldLeaderboard(repo, { today = townDay(), registry = loadRegistry(repo) } = {}) {
+export function foldLeaderboard(repo, { today = townDay(), registry = loadRegistry(repo), base = null } = {}) {
   const deliveries = parseDeliveries(repo);
-  const households = householdKeys(repo);
+  const households = base ?? householdKeys(repo);
   const ledgerPath = join(repo, 'WHITE_PAGES', 'stamp-ledger.md');
   const entries = existsSync(ledgerPath) ? parseStampLedger(readFileSync(ledgerPath, 'utf8')) : [];
   const { laws, revisions } = parseLaws(entries);
@@ -293,19 +313,86 @@ export function foldLeaderboard(repo, { today = townDay(), registry = loadRegist
   return { today, rows, totalCompletionsToday: rows.reduce((n, r) => n + r.completionsToday, 0), sendTgt: tgt('sent'), recvTgt: tgt('received') };
 }
 
+// WHO FILLED EACH SHARED HOUSEHOLD'S 5 TODAY (POS-327). The daily cap is the
+// household's (one 5 sends + one 5 receives across all its handles), and a
+// resident reading "4/5" on their own row cannot see which housemate used the
+// rest. This reads the SAME fold the mint counts by — deriveMints, unforked —
+// and groups the day's mints by the household key each handle wore THAT day
+// (currentHouseholds({ on }): the base registry with the ledger's sealed
+// `registry:` lines up to that day applied, the key deriveMints capped on). No
+// number is computed here that the mint does not already hold: a household's
+// total is the count of its members' mints today, and the cap is the mint's.
+//
+// Only SHARED households (more than one non-meep resident) get a row: a house of
+// one is its own bar and already reads in the leaderboard — decision 7's
+// surviving clause, "a solo resident never sees the household ceiling".
+// Deterministic: households by total (sends + receives) desc, then by their
+// first member's handle; contributors by count desc, then handle.
+export function foldHouseholdBars(repo, { today = townDay(), base = null } = {}) {
+  const deliveries = parseDeliveries(repo);
+  const ledgerPath = join(repo, 'WHITE_PAGES', 'stamp-ledger.md');
+  const entries = existsSync(ledgerPath) ? parseStampLedger(readFileSync(ledgerPath, 'utf8')) : [];
+  const { laws, revisions } = parseLaws(entries);
+  const mints = deriveMints(deliveries, base ?? householdKeys(repo), { laws, revisions });
+  // the roll ON the bar's day, so residents group by the key the mint capped
+  // them on that day; today's roll split one key's cap across two (POS-593:
+  // house-of-many-doors read 10/5 on 10-03, minted 5 + 5 under two keys)
+  const roll = currentHouseholds(repo, { base, on: today });
+  const isMeep = meepChecker(laws);
+  const keyOf = (handle) => roll.get(handle)?.key ?? `solo:${handle}`;
+
+  const members = new Map(); // key -> [handle] (non-meep, today)
+  for (const [handle, rec] of roll) {
+    if (isMeep(handle, today)) continue;
+    const list = members.get(rec.key) ?? [];
+    list.push(handle);
+    members.set(rec.key, list);
+  }
+  const bars = new Map(); // key -> { send: Map(handle->n), receive: Map(handle->n) }
+  for (const m of mints) {
+    if (m.date !== today) continue;
+    const key = keyOf(m.handle);
+    const b = bars.get(key) ?? { send: new Map(), receive: new Map() };
+    const side = m.side === 'sent' ? b.send : b.receive;
+    side.set(m.handle, (side.get(m.handle) ?? 0) + 1);
+    bars.set(key, b);
+  }
+  const who = (counts) => [...counts].map(([handle, n]) => ({ handle, n }))
+    .sort((x, y) => y.n - x.n || x.handle.localeCompare(y.handle));
+  const total = (counts) => [...counts.values()].reduce((s, n) => s + n, 0);
+  const out = [];
+  for (const [key, b] of bars) {
+    const residents = (members.get(key) ?? []).slice().sort();
+    if (residents.length < 2) continue;
+    out.push({
+      key, residents,
+      send: { total: total(b.send), by: who(b.send) },
+      receive: { total: total(b.receive), by: who(b.receive) },
+    });
+  }
+  out.sort((x, y) => (y.send.total + y.receive.total) - (x.send.total + x.receive.total)
+    || x.residents[0].localeCompare(y.residents[0]));
+  return out;
+}
+
+// The two kinds of bar, in the words every printed surface uses (POS-327,
+// Little Bird 10-04: the daily rows and the pair rows read alike and are not).
+export const KIND_LABEL = Object.freeze({ daily: 'Household · daily', pair: 'Just you · pair' });
+export const PAIR_RULE = "A full household bar doesn't block anyone's pair quests.";
+
 // The repo-side snapshot: the town's quest LEADERBOARD (Keemin's ruling). Rows
 // are today's questers, biggest first, with an all-time-completions standing
 // column; the rules stay thin and point at STAMPS.md. Plain markdown + frontmatter
 // so read_bulletin serves it through the doors for free. Deterministic bytes —
 // the crossing commits it, and the history is the archive.
-export function renderSnapshot(repo, { today = townDay(), registry = loadRegistry(repo) } = {}) {
-  const { rows, totalCompletionsToday, sendTgt, recvTgt } = foldLeaderboard(repo, { today, registry });
+export function renderSnapshot(repo, { today = townDay(), registry = loadRegistry(repo), base = null } = {}) {
+  const { rows, totalCompletionsToday, sendTgt, recvTgt } = foldLeaderboard(repo, { today, registry, base });
   const cell = (v, t) => (v >= t ? `${v}/${t} ✓` : `${v}/${t}`);
 
   // Budding friendships (the milestone). Omitted entirely until the stamps-v3
   // law is sealed, so the snapshot bytes are unchanged until the rule goes live.
   // Once live: every achieved rung, biggest each-way reach first, deterministic.
-  const friendships = foldFriendships(repo);
+  const friendships = foldFriendships(repo, { base });
   const friendshipBlock = (() => {
     if (!friendships.active) return '';
     const achieved = [];
@@ -320,16 +407,26 @@ export function renderSnapshot(repo, { today = townDay(), registry = loadRegistr
       ? ['| pair | reached | minted each | when |', '|---|---|---|---|',
          ...achieved.map((c) => `| ${c.a} & ${c.b} | ${c.threshold} letters each way | ${c.reward} | ${c.date} |`)].join('\n')
       : '_No budding friendship has crossed a rung yet._';
-    return `## Budding friendships
+    return `## Budding friendships (${KIND_LABEL.pair})
 
 A correspondence that *continued* — the town's fourth earning rule (${rungWords}), forward
 from ${friendships.startDate}, once per pair per rung, across two households, no meeps. Each
 pair's page carries its own progress; this is the durable roll of the ones that crossed.
+${PAIR_RULE}
 
 ${table}
 
 `;
   })();
+  const bars = foldHouseholdBars(repo, { today, base });
+  const barCell = (side, t) => {
+    const head = side.total >= t ? `${side.total}/${t} ✓` : `${side.total}/${t}`;
+    return side.by.length ? `${head} — ${side.by.map((w) => `${w.handle} ${w.n}`).join(' · ')}` : head;
+  };
+  const barsTable = bars.length
+    ? ['| household | Reach out | Be reached |', '|---|---|---|',
+       ...bars.map((b) => `| ${b.residents.join(' · ')} | ${barCell(b.send, sendTgt)} | ${barCell(b.receive, recvTgt)} |`)].join('\n')
+    : '_No shared household has filled a unit yet today._';
   const body = rows.length
     ? rows.map((r, i) => `| ${i + 1} | ${r.handle} | ${cell(r.todaySend, sendTgt)} | ${cell(r.todayReceive, recvTgt)} | ${r.completionsToday} | ${r.allTime} |`).join('\n')
     : '| — | _no questing yet today_ | — | — | — | — |';
@@ -343,6 +440,10 @@ ${headline} The town's daily quests, ranked — today's biggest questers first, 
 their all-time standing. Live per-resident progress is on each resident's page; this
 is the durable mirror, regenerated each ferry crossing.
 
+**Reach out** and **Be reached** are *${KIND_LABEL.daily}*: one shared 5 sends and 5 receives
+a day across every handle in a household. **Budding friendship** is *${KIND_LABEL.pair}*: per
+pair of handles, across households, and the daily cap never touches it.
+
 | # | resident | Reach out | Be reached | done today | all-time |
 |---|---|---|---|---|---|
 ${body}
@@ -350,9 +451,16 @@ ${body}
 _As of ledger day **${today}**. The office API is authoritative; this snapshot is the
 durable mirror — if they ever differ, the office is right and this page is stale._
 
+## Household bars today (${KIND_LABEL.daily})
+
+Who filled each shared household's 5 today, counted by the same fold the mint uses. A
+household of one is its own bar and reads in the table above.
+
+${barsTable}
+
 ${friendshipBlock}## The rules
 
-Two daily quests give the **existing correspondence mint** two visible faces — no new
+Two daily quests (*${KIND_LABEL.daily}*) give the **existing correspondence mint** two visible faces — no new
 stamp is minted for them; they name what already earns. **Reach out** — send to ${sendTgt}
 distinct valid residents in a day. **Be reached** — hear from ${recvTgt}. "Valid" is the
 same rule \`tools/stamp-mint.mjs\` mints by (non-self, non-bounced, non-meep, unique-per-day
@@ -369,6 +477,8 @@ Three things worth saying plainly, because the bar alone doesn't say them:
 - **The 5 is your household's, not yours alone.** The daily cap is keyed to the household,
   so residents sharing one roof share the same five sends and five receives. A household
   of three does not get fifteen.
+- **${PAIR_RULE}** Budding friendship (*${KIND_LABEL.pair}*) counts the letters
+  between two handles in two households, and the daily cap never touches it.
 `;
 }
 

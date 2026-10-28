@@ -12,7 +12,7 @@ import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { execFileSync } from 'node:child_process';
-import { pinJudgment, loadBindings, handleStandsOnBase } from './witness.mjs';
+import { pinJudgment, loadBindings, handleStandsOnBase, deferredBindingJudgment, homePictureNote } from './witness.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 
@@ -298,4 +298,60 @@ test('rule 2c admits a join that carries its OWN pin, and nothing else in the pi
   assert.match(pinJudgment({ base, head: base, handle: 'carol', verifiedId: 4242, verifiedLogin: 'carolgh' }), /adds no pin at all/);
   assert.match(pinJudgment({ base, head: { ...ok, carol: { login: 'CarolGH', id: 4242 } }, handle: 'carol', verifiedId: 4242, verifiedLogin: 'carolgh' }), /without a dated/);
   assert.match(pinJudgment({ base: null, head: ok, handle: 'carol', verifiedId: 4242, verifiedLogin: 'carolgh' }), /does not parse/);
+});
+
+// POS-158's join (office release/2026-w40): the pin is written at the crossing,
+// so the PR carries none, and the pen says so in one sentence. #3217 is the shape.
+const DEFERRED = (handle, id) => `**Verified via GitHub sign-in:** \`@commander-and-chief\` (immutable id \`${id}\`). The identity pin is not in this PR and needs no hand: \`${handle}\` binds to id \`${id}\` in the town's record at the first ferry crossing after this merges, and \`tools/github-ids.json\` is re-rendered from that record.`;
+
+test('rule 2c admits a pin-less pen join that defers its binding to the crossing (POS-158, #3217)', () => {
+  assert.equal(deferredBindingJudgment({ body: DEFERRED('wildcat', 334016343) + '\n\n**Household — pre-vouched.** …', handle: 'wildcat', verifiedId: 334016343 }), null);
+});
+
+test('a pin-less join with no deferred-binding sentence still goes to a person', () => {
+  assert.match(deferredBindingJudgment({ body: '**Verified via GitHub sign-in:** `@x` (immutable id `1`).', handle: 'wildcat', verifiedId: 1 }), /no deferred binding/);
+});
+
+test('a deferred binding for another handle, or another id, is not admitted', () => {
+  assert.match(deferredBindingJudgment({ body: DEFERRED('someone-else', 334016343), handle: 'wildcat', verifiedId: 334016343 }), /not the joining handle/);
+  assert.match(deferredBindingJudgment({ body: DEFERRED('wildcat', 999), handle: 'wildcat', verifiedId: 334016343 }), /not the verified id/);
+});
+
+test('a household HOLD still goes to a person, deferred binding or not', () => {
+  const body = DEFERRED('wildcat', 334016343) + '\n\n**Household — HOLD, please.** This PR appends `wildcat` to **x** …';
+  assert.match(deferredBindingJudgment({ body, handle: 'wildcat', verifiedId: 334016343 }), /sibling's vouch/);
+});
+
+// Rule 5d (POS-219, ADVISORY since 2026-10-01): a picture committed into HOME/
+// still certifies; the certification says where the house's picture lives,
+// and says it TRULY of this house.
+const KEPT = 'https://media.postmark.town/media/keeminlee/0f3c.jpg';
+const REG = { households: { starforge: { residents: ['mari', 'rei'], home_images: { mari: KEPT } } } };
+
+test("rule 5d: where the record keeps this resident a picture, the HOME/ file WON'T become it, and the line says how to set it", () => {
+  const r = homePictureNote('WHITE_PAGES/mari/HOME/the-marigold-house.jpg', 'added', REG);
+  assert.match(r, /won't become your house's picture/);
+  assert.match(r, /upload_media/);
+  assert.match(r, /household \{ do: "home", args: \{ image \} \}/);
+});
+
+test("rule 5d: where the record keeps none (a housemate's picture is not hers), it MAY NOT — the site's fallback still shows a HOME/ face", () => {
+  const r = homePictureNote('WHITE_PAGES/rei/HOME/art/lanternstep.PNG', 'modified', REG);
+  assert.match(r, /may not become your house's picture/);
+  assert.doesNotMatch(r, /won't/);
+  assert.match(homePictureNote('WHITE_PAGES/rei/HOME/x.png', 'added', null), /may not/, 'no registry readable: the cautious sentence');
+});
+
+test('rule 5d says nothing of prose, removals, or pictures outside HOME/', () => {
+  assert.equal(homePictureNote('WHITE_PAGES/mari/HOME/HOME.md', 'modified', REG), null);
+  assert.equal(homePictureNote('WHITE_PAGES/mari/HOME/old.jpg', 'removed', REG), null);
+  assert.equal(homePictureNote('WHITE_PAGES/mari/outbox/letter-2026-09-28-x/photo.jpg', 'added', REG), null);
+  assert.equal(homePictureNote('WHITE_PAGES/mari/avatar.png', 'added', REG), null);
+});
+
+test('rule 5d REFUSES NOTHING: the loop adds its line to the notes, never to the reasons, and the certification carries the notes', () => {
+  const src = readFileSync(join(HERE, 'witness.mjs'), 'utf8');
+  assert.match(src, /const homePicture = homePictureNote\(p, f\.status, registryAtBase\);\r?\n\s*if \(homePicture\) notes\.push\(homePicture\);/);
+  assert.doesNotMatch(src, /resident\(homePicture\)|mind\(homePicture\)/);
+  assert.ok(src.includes("...(notes.length ? ['', ...notes.map((n) => `- ${n}`)] : [])"), 'the merge comment appends the notes');
 });

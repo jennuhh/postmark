@@ -12,7 +12,7 @@
 // THE GRAMMAR (double-entry, signature-linked — Ember fold, 2026-07-08):
 //   - <date> · rules: stamps-v1 · sig: <ed25519-b64url>
 //   - <date> · rules: stamps-v2 · meeps: <a,b,c> · sig: <...>       (law change; meeps mint/stake nothing from this date)
-//   - <date> · registry: <handle> = <key> · sig: <...>              (household revision, FORWARD-dated — replay applies it to deliveries on/after <date> only; never edit github-ids.json for an already-minted handle. Bitten twice: the original tulip lesson, then 2026-08-07 when a well-meant identity repair PINNED claude-of-tulip at dregg's id and silently re-derived June — the pin was reverted, the current identity rides the 07-13 ledger line, and the live suite now runs the full verifier so this class fails a PR instead of a crossing. THIRD BITE 2026-08-24 (`62a8bac8`), and it ended the reverting: the office pinned claude-of-tulip — 71 days unpinned, own-page PRs unable to certify, an honest need — and June went red again at line 344 under a truthful recorded ledger. The 07-13 line should already have made that edit harmless. It now does: a pin whose `pinned:` date falls on or after a handle's earliest sealed registry line is INERT in householdKeys, so the file can no longer reach backwards past the ledger that superseded it. The pin STANDS — the witness still binds by it; what it lost is its retroactive half)
+//   - <date> · registry: <handle> = <key> · sig: <...>              (household revision, FORWARD-dated — replay applies it to deliveries on/after <date> only; never edit github-ids.json for an already-minted handle. Bitten twice: the original tulip lesson, then 2026-08-07 when a well-meant identity repair PINNED claude-of-tulip at dregg's id and silently re-derived June — the pin was reverted, the current identity rides the 07-13 ledger line, and the town suite (.github/workflows/suite.yml, POS-516) now runs the full verifier, node tools/stamp-verify.mjs, on every PR into main or a train and on every push to main, so this class fails a PR instead of a crossing. THIRD BITE 2026-08-24 (`62a8bac8`), and it ended the reverting: the office pinned claude-of-tulip — 71 days unpinned, own-page PRs unable to certify, an honest need — and June went red again at line 344 under a truthful recorded ledger. The 07-13 line should already have made that edit harmless. It now does: a pin whose `pinned:` date falls on or after a handle's earliest sealed registry line is INERT in householdKeys, so the file can no longer reach backwards past the ledger that superseded it. The pin STANDS — the witness still binds by it; what it lost is its retroactive half)
 //   - <date> · MINT → <handle> · 1 · for: <letter-id> (sent|received)[ · provisional] · sig: <...>
 //   - <date> · MINT → <handle> · 1 · for: vote:<topic> (stake) · sig: <...>   (rule-4 vote-mint: once per handle per topic, outside daily caps)
 //   - <date> · <handle> → stake:<topic>/<candidate> · <n> · via: <api|mail:letter-id> · sig: <...>
@@ -28,10 +28,18 @@
 //   - <date> · stake:pot/<pot> → <handle> · <n> · for: unstake · via: <channel>   (RESIDENT-INITIATED unstake before any close — the world-mark precedent (`for: unstake`, the staker's own act) pointed at a funding pot. It is NOT a close and must never read as one: a pot-return names an epoch and is one row of a contiguous derived block, while this row names none and stands alone, so foldClosedEpochs does not see it and a pot whose staker walked away is still open for its epoch. Clipped to the staker's OWN open position on that pot — the escrow account is per POT while a position is per (pot, handle), so without that clip one resident could take another's stamps out with every account still non-negative (the hole the world-unstake branch in stamp-verify exists for). Carries `via:` where world-unstake does not, because a keeping stake records its channel on the way in and a reader comparing the pair should not have to infer the way out.)
 //   - <date> · stake:pot/<pot> → BURN · <n> · for: keeping:<epoch> · staker: <handle>   (RETIRED 2026-09-14 — "nothing burns; every open stake returns whole". The grammar stays defined so the retired shape still PARSES and therefore still fails the close replay by name rather than reading as unknown; no close derives one, and a ledger carrying one diverges)
 //   - <date> · minted · <staker> · <n> · for: keeping:<pot> · epoch:<epoch>     (RETIRED 2026-09-14 — "no stake burns, so there is no σ leg and no keeping mint". Same posture as the burn row above: the grammar stays defined so the shape parses and fails the replay by name, and foldKeepingMint stays as the reader of the historical rows (the live ledger holds none). R12's original words stand in this file's history. The arrow-bearing `MINT → … · for: keeping:…` smuggle was never lawful and still is not)
-//   - <date> · pot-receipt · pot:<pot> · rail: <stripe|usdc|grant> · usd: <n> · from: <payer> · ref: <ref>   (a witnessed real-dollar payment against a pot; ARROW-FREE — mints and moves nothing by itself; ref is unique forever: one dollar, one mint chance, a re-recorded receipt bounces)
+//   - <date> · pot-receipt · pot:<pot> · rail: <stripe|usdc|paypal|grant> · usd: <n> · from: <payer> · ref: <ref>   (a witnessed real-dollar payment against a pot; ARROW-FREE — mints and moves nothing by itself; ref is unique forever: one dollar, one mint chance, a re-recorded receipt bounces)
 //   - <date> · pot-correction · ref: <ref> · from <old-payer> to <new-payer> · <reason> · by: <who>   (THE HAND, CORRECTED. A witnessed dollar's payer was wrong — a mistyped handle, a login the office could not resolve, the wrong household — and this row says so. ARROW-FREE like the receipt it corrects, so no movement fold can see it; it moves nothing and it is not a second receipt. It names the ORIGINAL ref verbatim and both hands, so a reader can check the correction against the row it corrects and a fold can REFUSE one whose `from` does not match what the receipt currently says. It carries NO usd and NO pot, because there is nothing here to express them with: this corrects WHOSE dollar it was, never how many or which pot — those are the payment itself and a correction is not a re-payment. `by:` is provenance in the gift/issuance sense, naming the pen; it is not the gate. The gate is that nothing but a hand-run `epoch-close.mjs --correct-hand` can emit one — no door, no watcher, no automatic caller — plus the signature chain every row already rides.)
 //   - <date> · holo · <payer-handle> · <n> · pot:<pot> · epoch:<epoch> · ref: <ref>   (THE GIVERS' REWARD — the one equity row a close writes. AMENDED 2026-09-17 at the founder's ruling: "non-spendable is repealed; the stamps are like any other, but are holo to signify the special source." So a holo row of <n> CREDITS the payer's balance by <n> and counts in minted-cumulative, and those stamps stake, vote, pay and transfer like any stamp; "holo" now names the SOURCE, not a restriction, and the town shows them in holo ink. The shape stays ARROW-FREE because a holo row is a MINT, not a movement — the balance and mint folds credit it BY KIND (foldBalances draws it from the MINT account exactly as an arrow-bearing mint does, so conservation stays structural), and stamp-verify's running fold does the same so a giver's first stake of holo stamps replays clean. A close writes ONE of these per receipt it settles and <n> MAY BE 0: dollars that mint nothing — treasury, outside, ρ-capped, sole-staker-sole-payer — are remembered all the same, and the row naming the ref is what marks that dollar's one mint chance as spent. Who paid and how many dollars stay on the pot-receipt this row's `ref:` points at; the receipt is the only money row, so nothing is restated here)
-//   - <date> · <handle> → BURN · <n> · ...        (reserved; dormant until blessings)
+//   THE IDEA POSTS (POS-290, ruled by Wright 2026-10-09 on Darko's re-scope; inert until the office writes them):
+//   - <date> · MINT → <handle> · <n> · for: post:<author>/<slug>/<label> · by: <hand>   (an award on an idea post — a hand pays a credited resident; n 1..AWARD_MAX, by: one of AWARD_HANDS, never a meep, ONE line per post and label, and the label is never a bug stage's name)
+//   - <date> · <handle> → stake:post/<author>/<slug> · <n> · side: <for|against> · via: <channel>   (a stake on a post, with a side — one side per (post, handle) while the position is open)
+//   - <date> · stake:post/<author>/<slug> → <handle> · <n> · for: unstake · via: <channel>   (the staker's own way out, clipped to their OWN position)
+//   - <date> · stake:post/<author>/<slug> → <handle> · <n> · for: post-return   (the post finished: the open position comes home whole, once per (post, handle))
+//   THE BUG STAGE CORRECTION (POS-649, Darko 2026-10-15: "the mint to kino to give them the 10 … burning the 10 that you mistakenly got"):
+//   - <date> · MINT → <handle> · <n> · for: post:<author>/<slug>/<stage>-recredit · by: the-town   (the stage paid to the right resident: diagnosed, briefed or fixed only, the SAME amount its stage line paid, never to that line's own recipient, never a meep, ONE per post and stage, and always immediately followed by its burn)
+//   - <date> · <handle> → BURN · <n> · for: correction:<sig> · by: <hand>   (the wrong stage mint, burned exactly: <sig> is that post:<id>/<stage> line's full signature, <handle> its recipient, <n> its amount, out of liquid stamps only, ONCE per mint, by: one of CORRECTION_HANDS, and always immediately after its recredit. The two are appended together by --stage-recredit or not at all)
+//   - <date> · <handle> → BURN · <n> · ...        (reserved; dormant until blessings — every other burn; only `for: correction:` is live)
 // Every entry that moves stamps is a two-sided movement — conservation is
 // structural (entries sum to zero against the MINT/BURN accounts); a balance is
 // a pure fold, and the fold must never take any account except MINT below zero.
@@ -93,6 +101,9 @@
 //   node tools/stamp-mint.mjs --declare-registry "handle = gh:ID" --date YYYY-MM-DD --key FILE
 //   node tools/stamp-mint.mjs --gift <handle> --amount N --slug <kebab-reason> --by <founder> --date YYYY-MM-DD --key FILE
 //   node tools/stamp-mint.mjs --town-issuance <treasury> --amount N --purpose <kebab> --by <who> --provenance TEXT --date YYYY-MM-DD --key FILE
+//   node tools/stamp-mint.mjs --stage-mint <handle> --post <author>/<slug> --stage <stage> --amount N --date YYYY-MM-DD --key FILE
+//   node tools/stamp-mint.mjs --stage-recredit <handle> --post <author>/<slug> --stage <stage> --by <hand> --date YYYY-MM-DD --key FILE [--amount N --from <handle>]
+//   node tools/stamp-mint.mjs --award-mint <handle> --post <author>/<slug> --label <label> --amount N --by <hand> --date YYYY-MM-DD --key FILE
 //
 // Locking: appenders must hold the town lock (the ferry's flock) — this tool
 // does not lock for you. Node v18+. Built-ins only.
@@ -262,6 +273,36 @@ export function householdKeys(repo) {
   return map;
 }
 
+// WHO THE WELCOME MAY PAY, AND WHICH HOUSE THEY ARE IN (Postmark Auth,
+// 2026-09-29). Read by --welcome-plan and --welcome only, never by the fold or
+// the verifier, so it can make the welcome stricter and can never turn a
+// recorded line red.
+//   bound(h)   — the resident has a GitHub id on record (a pin). An unbound
+//                resident is keyed by the GitHub username on their card, which
+//                the once-per-household check cannot see through.
+//   houseOf(h) — the declared house the store lists the resident in, or null.
+//
+// THE STORE'S RECORD WHEN THE OFFICE HANDS IT OVER (POS-344, w42). The office
+// is where the store is read: its welcome pass writes the registry and pins
+// from `households` / `household_pins` to a file and names it with
+// `--registry`, as `{ households: { <slug>: … }, pins: { <handle>: … } }` —
+// the same two shapes as tools/households.json's `households` and
+// tools/github-ids.json. Then a house bound in the store and not yet printed is
+// owed, and nothing the printouts say on their own can make one owed.
+// Without `--registry` (a hand run from the town checkout) this reads the
+// printouts, which are the store's export.
+export function welcomeBinding(repo, registry = null) {
+  const readJson = (p) => { try { return JSON.parse(readFileSync(join(repo, 'tools', p), 'utf8')); } catch { return null; } };
+  const pins = registry ? (registry.pins ?? {}) : (readJson('github-ids.json') ?? {});
+  const houses = registry ? (registry.households ?? {}) : (readJson('households.json')?.households ?? {});
+  const house = new Map();
+  for (const [slug, rec] of Object.entries(houses)) for (const r of rec?.residents ?? []) house.set(r, slug);
+  return {
+    bound: (h) => Boolean(pins[h] && typeof pins[h] === 'object' && pins[h].id),
+    houseOf: (h) => house.get(h) ?? null,
+  };
+}
+
 // The CURRENT household view: the from-genesis base above with the ledger's
 // dated `registry:` revisions folded to now — the same fold deriveMints and
 // ballot apply per-date, exported once so no current-state consumer re-invents
@@ -270,13 +311,31 @@ export function householdKeys(repo) {
 // (1 human = 1 household): membership DECLARATIONS live in tools/households.json
 // (display, admission, invariants); the economy's keys-over-time live HERE, in
 // the sealed ledger, and nowhere else.
-export function currentHouseholds(repo) {
-  const map = householdKeys(repo);
+//
+// `base` is the key base when the CALLER read it (POS-341 part 4: the office
+// hands over the store's, householdKeys' shape, handle -> { key, provisional }).
+// Omitted, this reads householdKeys(repo) exactly as before. A copy is folded,
+// so the caller's map is never changed.
+// `on` (a town day, optional): the roll as it stood that day, with only the
+// registry lines sealed by then applied, which is the key deriveMints capped on
+// that day (householdOn). Without it, every sealed line: the roll now (POS-593).
+export function currentHouseholds(repo, { base = null, on = null } = {}) {
+  const map = base ? new Map(base) : householdKeys(repo);
   const ledgerPath = join(repo, 'WHITE_PAGES', 'stamp-ledger.md');
   const entries = existsSync(ledgerPath) ? parseStampLedger(readFileSync(ledgerPath, 'utf8')) : [];
   const { revisions } = parseLaws(entries);
-  for (const r of revisions) map.set(r.handle, { key: r.key, provisional: false });
+  for (const r of revisions) if (on == null || r.date <= on) map.set(r.handle, { key: r.key, provisional: false });
   return map;
+}
+
+/** A handle's household on a town day, the key the mint caps on: the base
+ *  record, then every sealed `registry:` line dated on or before the day, the
+ *  last one winning. One home for "a household's key on a date" (POS-593):
+ *  deriveMints, foldPairFriendships and currentHouseholds({ on }) all read it. */
+export function householdOn(households, revisions, handle, date) {
+  let rec = households.get(handle) ?? { key: `solo:${handle}`, provisional: true };
+  for (const r of revisions) if (r.handle === handle && r.date <= date) rec = { key: r.key, provisional: false };
+  return rec;
 }
 
 // ── ledger line classification (laws, revisions, mints, stakes) ─────────────
@@ -303,8 +362,13 @@ const MINT_RE = /^- (\d{4}-\d{2}-\d{2}) · MINT → (\S+) · 1 · for: (\S+) \((
 // called "pot" — the same silent-misclassification class the world-mark
 // lookahead exists for. No live ballot topic is named "pot"; the live replay
 // stays byte-identical (checked: verify green over the unchanged ledger).
-const STAKE_RE = /^- (\d{4}-\d{2}-\d{2}) · (\S+) → stake:(?!world-mark\/|pot\/)([a-z0-9-]+)\/([A-Za-z0-9-]+) · (\d+) · via: (\S+)$/;
-const RETURN_RE = /^- (\d{4}-\d{2}-\d{2}) · stake:(?!world-mark\/|pot\/)([a-z0-9-]+)\/([A-Za-z0-9-]+) → (\S+) · (\d+) · for: close$/;
+// `post/` joined them for the idea posts (POS-290, 2026-10-09), for the same
+// reason: a post stake with its author half dropped (`stake:post/<slug>`) would
+// otherwise read as a VOTE stake on a topic called "post". No ballot topic is
+// named "post", and every line of the live ledger classifies as it did before
+// (checked line by line, main's classifier against this one).
+const STAKE_RE = /^- (\d{4}-\d{2}-\d{2}) · (\S+) → stake:(?!world-mark\/|pot\/|post\/)([a-z0-9-]+)\/([A-Za-z0-9-]+) · (\d+) · via: (\S+)$/;
+const RETURN_RE = /^- (\d{4}-\d{2}-\d{2}) · stake:(?!world-mark\/|pot\/|post\/)([a-z0-9-]+)\/([A-Za-z0-9-]+) → (\S+) · (\d+) · for: close$/;
 // ── world-mark stakes (write-release P3; ruled 2026-07-27: extend the sealed mint)
 // A world-mark stake targets a mark in the told world, and a mark id is
 // `<by>/<slug>` — it CARRIES A SLASH, which STAKE_RE's candidate class cannot
@@ -377,6 +441,135 @@ export const HOUSEHOLD_KEY_RE = new RegExp(String.raw`^${HOUSEHOLD_KEY}$`);
 // this mint is paid to ONE resident on behalf of a whole house: the line has to
 // say which house was paid, or the roll cannot be read back.
 const WELCOME_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · MINT → (\S+) · ([1-9]\d*) · for: welcome:(${HOUSEHOLD_KEY}) · by: (\S+)$`);
+// QUEST PAY — a quest the town pays by hand-reviewed pass (POS-632; Darko
+// 2026-10-14 20:48 "quests are always paid by the town mint"; the shape is
+// Wright's Q2 of the same night):
+//   - <date> · MINT → <handle> · <n> · for: quest:<quest-id>/<household-key> · by: the-town
+// One generic grammar for every such quest: a new one adds a row to QUEST_PAY,
+// never a grammar. Movement-shaped (MINT → handle), so conservation folds it
+// structurally. NOT replay-derived: what earned it (for the first row, a comment
+// on the designated blueprints discussion, or a marked letter to the postmaster
+// read by a hand) is judged outside this verb, so like a welcome the line is asserted
+// in place, written by the office's reviewed pass (postmark-office
+// tools/quest-pay-plan.mjs, plan + digest + --apply, by hand) through
+// --quest-mint. It cannot collide with the grammars above it: GIFT wants
+// `for: gift:`, FIRST_IDEA `for: first-idea:`, WELCOME `for: welcome:`, STAGE
+// and AWARD `for: post:`; this one alone says `for: quest:`.
+//
+// The verifier holds what a signature cannot, from the sealed table below and
+// never from the registry (the registry stays documentation, as its note says):
+// the quest is in QUEST_PAY; the amount is exactly its amount; the line's date
+// is inside its window; `by:` is the-town; the meep law; the named key IS the
+// recipient's household at the line's date; and ONE line per quest and
+// household, ever.
+//
+// ONCE PER HOUSEHOLD IS LAW (Darko 2026-10-15 11:17, POS-632 Q1): "Paying per
+// resident is never acceptable for quests. It's always by household." The line
+// carries the household key, and one line per quest and household holds across
+// every source the office's pass reads (a comment and a letter from one house
+// pay once).
+export const QUEST_PAY = Object.freeze({
+  'read-v2-feedback': Object.freeze({ amount: 5, once_per: 'household', from: '2026-10-15', until: null }),
+});
+export const QUEST_ID_RE = /^[a-z0-9][a-z0-9-]*$/;
+const QUEST_PAY_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · MINT → (\S+) · ([1-9]\d*) · for: quest:([a-z0-9][a-z0-9-]*)\/(${HOUSEHOLD_KEY}) · by: (\S+)$`);
+// POST STAGE — a bug's stage stamps (the Posts project, phase 2, Keemin
+// 2026-09-29: "Bugs pay the flat ladder, with no staking"). The town pays the
+// resident who did a stage of a bug post: confirmed 2 (the reporter),
+// reproduced 3, diagnosed 5, briefed 10 light / 5 heavy, fixed 10 / 25 / 50
+// by size. Same shape and same reasons as welcome and first-idea:
+// movement-shaped (MINT → handle) so conservation folds it structurally; NOT
+// replay-derived, because the stage happened in the office's store, which this
+// repo cannot see — so the stage having happened is the pen's assertion,
+// exactly as a join bundle is, written by the office's reviewed stage pass
+// (postmark-office tools/bug-stage-plan.mjs, run by hand, never on a tick).
+//
+// It cannot collide with the grammars above it: GIFT_RE wants `for: gift:`,
+// FIRST_IDEA_RE `for: first-idea:`, WELCOME_RE `for: welcome:`, and MINT_RE a
+// `(side)` tail where this line ends `· by: …`. Below it, ISSUANCE_RE needs
+// `for: issuance:` and a `note:` tail and FRIENDSHIP_RE a `(via …)` tail. The
+// segment is `post:<post-id>/<stage>`: the post id is `<author>/<slug>` (a
+// handle may carry a dot, a slug may not), and the stage is one of the paid
+// five, so the last `/` always splits id from stage. tools/stamp-stage.test.mjs
+// proves the classification against every sibling grammar.
+//
+// The verifier holds what a signature cannot: the amount is on the ladder for
+// its stage, `by:` is the-town, the meep law, and ONE line per post and stage,
+// ever — so a forged-but-signed line or a second pass fails to verify instead
+// of minting twice.
+export const STAGE_LADDER = Object.freeze({
+  confirmed: Object.freeze([2]),
+  reproduced: Object.freeze([3]),
+  diagnosed: Object.freeze([5]),
+  briefed: Object.freeze([10, 5]),
+  fixed: Object.freeze([10, 25, 50]),
+});
+export const STAGE_POST_ID_RE = /^[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9-]*$/;
+const STAGE_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · MINT → (\S+) · ([1-9]\d*) · for: post:([a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9-]*)\/(${Object.keys(STAGE_LADDER).join('|')}) · by: (\S+)$`);
+// ── THE IDEA POSTS (POS-290; Darko's re-scope of 2026-10-09, the grammar ruled by
+// Wright the same evening) ────────────────────────────────────────────────────
+// Ideas become posts, and two kinds of money touch them. Both are written by the
+// office and asserted in place, like a stage line, because the post lives in the
+// office's store and this repo cannot see it.
+//
+// THE AWARD. A hand pays a credited resident for work on an idea post:
+//   - <date> · MINT → <handle> · <n> · for: post:<author>/<slug>/<label> · by: <hand>
+// Movement-shaped (MINT → handle), so conservation folds it structurally. It is
+// the stage line's shape with a free label where the stage was, so the two must
+// never claim each other's line, and the label's class says so twice: AWARD_RE
+// refuses a label that IS a stage name (the lookahead), and STAGE_RE takes only
+// the five names. A label like `fixed-2` is an award. The verifier holds what a
+// signature cannot: n is 1..AWARD_MAX, `by:` is one of AWARD_HANDS (the award
+// moves money and meeps never handle stamps), the meep law on the recipient, and
+// ONE line per post and label, ever. The amount is the act's own; nothing here
+// computes one. The writer is the office's reviewed award pass, run by hand.
+//
+// THE STAKE WITH A SIDE. A resident backs a post for or against it:
+//   - <date> · <handle> → stake:post/<author>/<slug> · <n> · side: <for|against> · via: <channel>
+//   - <date> · stake:post/<author>/<slug> → <handle> · <n> · for: unstake · via: <channel>
+//   - <date> · stake:post/<author>/<slug> → <handle> · <n> · for: post-return
+// The escrow account is per POST and a position is per (post, handle), with one
+// side while it is open. The unstake is the staker's own act and clips to their
+// OWN position: the world-unstake hole (stamp-verify, the world-mark branch),
+// where the account stays non-negative while one resident drains another's
+// stake. The return is what a finished post owes: the whole open position, once
+// per (post, handle). The target is `post/`, never the post's class: the town
+// cannot see a class, and a class in the line would be a second, unchecked fact.
+// All three sit above TRANSFER for the reason the world and pot pairs do.
+export const AWARD_MAX = 200;
+export const AWARD_HANDS = Object.freeze(['keemin', 'wright']);
+export const AWARD_LABEL_RE = /^[a-z0-9][a-z0-9-]{0,39}$/;
+const POST_ID = String.raw`[a-z0-9][a-z0-9._-]*\/[a-z0-9][a-z0-9-]*`;
+// ── THE BUG STAGE CORRECTION (POS-649, a hotfix; Darko 2026-10-15) ───────────
+// A stage paid to the wrong resident is corrected by TWO lines, appended
+// together by --stage-recredit (the office's reviewed stage pass calls it under
+// the town lock) or not at all:
+//   - <date> · MINT → <handle> · <n> · for: post:<author>/<slug>/<stage>-recredit · by: the-town
+//   - <date> · <wrong> → BURN · <n> · for: correction:<sig> · by: <hand>
+// The recredit is the stage's own line again, to the right resident, for the
+// SAME amount (the stage's terms were already paid once; nothing here computes
+// one). The burn names the wrong mint by its full signature, from the handle it
+// paid, for exactly its amount, out of liquid stamps: an escrowed stamp is not
+// the wrong recipient's to give up, so a short balance refuses. Both are
+// movement-shaped, so conservation folds them structurally: MINT pays the
+// recredit and BURN, the reserved account, receives the burn. The original mint
+// stays in the ledger, as everything does; the correction is what reads it.
+// The verifier holds what a signature cannot (stamp-verify § the correction):
+// the pairing, the amount, the recipient, the stage, the hand, ONE recredit per
+// post and stage and ONE burn per mint. The general `<handle> → BURN` stays
+// reserved and dormant; only `for: correction:` is live.
+export const RECREDIT_STAGES = Object.freeze(['diagnosed', 'briefed', 'fixed']);
+export const CORRECTION_HANDS = AWARD_HANDS;
+/** An ed25519 signature in base64url: 64 bytes, 86 characters. */
+export const SIG_RE = /^[A-Za-z0-9_-]{86}$/;
+const RECREDIT_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · MINT → (\S+) · ([1-9]\d*) · for: post:(${POST_ID})\/(${RECREDIT_STAGES.join('|')})-recredit · by: (\S+)$`);
+const CORRECTION_BURN_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · (\S+) → BURN · ([1-9]\d*) · for: correction:([A-Za-z0-9_-]{86}) · by: (\S+)$`);
+// The award's label may never be a stage's name, nor a stage's recredit: either
+// would claim a line the stage grammar owns.
+const AWARD_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · MINT → (\S+) · ([1-9]\d*) · for: post:(${POST_ID})\/(?!(?:${Object.keys(STAGE_LADDER).join('|')}) · by: )(?!(?:${RECREDIT_STAGES.join('|')})-recredit · by: )([a-z0-9][a-z0-9-]{0,39}) · by: (\S+)$`);
+const POST_STAKE_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · (\S+) → stake:post\/(${POST_ID}) · ([1-9]\d*) · side: (for|against) · via: (\S+)$`);
+const POST_UNSTAKE_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · stake:post\/(${POST_ID}) → (\S+) · ([1-9]\d*) · for: unstake · via: (\S+)$`);
+const POST_RETURN_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · stake:post\/(${POST_ID}) → (\S+) · ([1-9]\d*) · for: post-return$`);
 // A friendship mint (stamps-v3) is ALSO movement-shaped (MINT → handle · n), so
 // conservation folds it structurally. It cannot collide with MINT_RE (n > 1 and
 // `for: friendship:… (via …)` not `(sent|received|stake)`) or GIFT_RE
@@ -500,7 +693,11 @@ const ISSUANCE_RE = /^- (\d{4}-\d{2}-\d{2}) · MINT → (\S+) · ([1-9]\d*) · f
 // history, and in the PSAs of 2026-08-21/23. No close ever ran under it.
 const POT_ID_CLASS = String.raw`[a-z0-9][a-z0-9-]*`;
 const EPOCH_CLASS = String.raw`\d{4}-\d{2}`;
-export const KEEPING_RAILS = ['stripe', 'usdc', 'grant'];
+// PAYPAL, the third money rail (POS-183 part 2, 2026-09-29): one-time gifts to a
+// pot for givers whose banks balk at a foreign card charge. Its receipts are
+// written by the office's paypal-watch, `ref: paypal:<capture id>`, under the
+// same contract as the card rail's; only the rail's name is new.
+export const KEEPING_RAILS = ['stripe', 'usdc', 'paypal', 'grant'];
 // THE ONE-SPELLING LAW (2026-08-25, the mixed-case ref bug — office twin in
 // src/usdc-witness.mjs): hex has two spellings and the ledger's uniqueness is
 // an exact string compare, so `0xAB…` and `0xab…` would be two mint chances
@@ -515,7 +712,7 @@ export function canonicalRef(ref) {
 // close, and so no holo ever mints against it. The founding family grant is
 // its first receipt.
 export const TREASURY_POT = 'treasury';
-const POT_RECEIPT_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · pot-receipt · pot:(${POT_ID_CLASS}) · rail: (stripe|usdc|grant) · usd: ([1-9]\d*) · from: (\S+) · ref: (\S+)$`);
+const POT_RECEIPT_RE = new RegExp(String.raw`^- (\d{4}-\d{2}-\d{2}) · pot-receipt · pot:(${POT_ID_CLASS}) · rail: (${KEEPING_RAILS.join('|')}) · usd: ([1-9]\d*) · from: (\S+) · ref: (\S+)$`);
 // THE CORRECTION ROW. ARROW-FREE for the same reason the receipt is: foldBalances
 // and foldMintCount key on the raw movement shape `<from> → <to> · <n> ·`, and a
 // correction moves nothing. `from X to Y` is void's own arrow-free wording
@@ -611,6 +808,14 @@ export function classifyEntry(canonical) {
     return { kind: 'pot-return', date: m[1], pot: m[2], handle: m[3], n: Number(m[4]), epoch: m[5] };
   if ((m = POT_UNSTAKE_RE.exec(canonical)))
     return { kind: 'pot-unstake', date: m[1], pot: m[2], handle: m[3], n: Number(m[4]), via: m[5] };
+  // The post trio sits above TRANSFER with the world and pot pairs: a post stake
+  // or unstake carried by a letter reads `via: mail:<id>` at its tail.
+  if ((m = POST_STAKE_RE.exec(canonical)))
+    return { kind: 'post-stake', date: m[1], handle: m[2], post: m[3], n: Number(m[4]), side: m[5], via: m[6] };
+  if ((m = POST_UNSTAKE_RE.exec(canonical)))
+    return { kind: 'post-unstake', date: m[1], post: m[2], handle: m[3], n: Number(m[4]), via: m[5] };
+  if ((m = POST_RETURN_RE.exec(canonical)))
+    return { kind: 'post-return', date: m[1], post: m[2], handle: m[3], n: Number(m[4]) };
   if ((m = KEEPING_BURN_RE.exec(canonical)))
     return { kind: 'keeping-burn', date: m[1], pot: m[2], n: Number(m[3]), epoch: m[4], handle: m[5] };
   if ((m = KEEPING_MINT_RE.exec(canonical)))
@@ -629,6 +834,16 @@ export function classifyEntry(canonical) {
     return { kind: 'first-idea', date: m[1], handle: m[2], n: Number(m[3]), mark: m[4], by: m[5] };
   if ((m = WELCOME_RE.exec(canonical)))
     return { kind: 'welcome', date: m[1], handle: m[2], n: Number(m[3]), household: m[4], by: m[5] };
+  if ((m = QUEST_PAY_RE.exec(canonical)))
+    return { kind: 'quest-pay', date: m[1], handle: m[2], n: Number(m[3]), quest: m[4], household: m[5], by: m[6] };
+  if ((m = RECREDIT_RE.exec(canonical)))
+    return { kind: 'post-recredit', date: m[1], handle: m[2], n: Number(m[3]), post: m[4], stage: m[5], by: m[6] };
+  if ((m = CORRECTION_BURN_RE.exec(canonical)))
+    return { kind: 'correction-burn', date: m[1], handle: m[2], n: Number(m[3]), sig: m[4], by: m[5] };
+  if ((m = STAGE_RE.exec(canonical)))
+    return { kind: 'post-stage', date: m[1], handle: m[2], n: Number(m[3]), post: m[4], stage: m[5], by: m[6] };
+  if ((m = AWARD_RE.exec(canonical)))
+    return { kind: 'post-award', date: m[1], handle: m[2], n: Number(m[3]), post: m[4], label: m[5], by: m[6] };
   if ((m = ISSUANCE_RE.exec(canonical)))
     return { kind: 'town-issuance', date: m[1], handle: m[2], n: Number(m[3]), purpose: m[4], by: m[5], note: m[6] };
   if ((m = FRIENDSHIP_RE.exec(canonical)))
@@ -657,11 +872,7 @@ export function deriveMints(deliveries, households, { laws = [], revisions = [] 
   const seenPair = new Set();   // `${day}|sent|${sender}|${recipient}` — unique-address-per-day
   const dayCount = new Map();   // `${day}|sent|${householdKey}` -> n — the caps
 
-  const hh = (handle, date) => {
-    let rec = households.get(handle) ?? { key: `solo:${handle}`, provisional: true };
-    for (const r of revisions) if (r.handle === handle && r.date <= date) rec = { key: r.key, provisional: false };
-    return rec;
-  };
+  const hh = (handle, date) => householdOn(households, revisions, handle, date);
   const lawAt = (date) => {
     let active = { rules: RULES_V1, meeps: new Set() };
     for (const l of laws) if (l.date <= date) active = l;
@@ -718,11 +929,8 @@ export function foldPairFriendships(deliveries, households, { laws = [], revisio
   const startDate = active.date;
   const ladder = active.friendship;
   const isMeep = meepChecker(laws);
-  const hh = (handle, date) => {
-    let key = households.get(handle)?.key ?? `solo:${handle}`;
-    for (const r of revisions) if (r.handle === handle && r.date <= date) key = r.key;
-    return key;
-  };
+  // a record whose key is null still reads as a house of one here, as it always did (Rivet, review of #3682)
+  const hh = (handle, date) => householdOn(households, revisions, handle, date).key ?? `solo:${handle}`;
   const pairs = new Map(); // "a|b" -> { a, b, fwd, rev, min, crossings:[{threshold,reward,date,viaId,qualified}] }
   for (const d of deliveries) {
     if (d.date < startDate || d.from === d.to) continue; // forward-only; self-mail is not a correspondence
@@ -846,6 +1054,7 @@ export function deriveTransfers(deliveries, households, { laws = [], revisions =
     else if (c.kind === 'gift') add(c.handle, c.n);     // founder gift — recorded before any settlement we'd append, so it funds later pays
     else if (c.kind === 'first-idea') add(c.handle, c.n); // first-idea quest mint — same in-place assertion class as a gift
     else if (c.kind === 'welcome') add(c.handle, c.n);  // welcome bundle — the same in-place assertion class, paid once per household at its first resident
+    else if (c.kind === 'quest-pay') add(c.handle, c.n); // a hand-reviewed quest the town pays (POS-632) — the same in-place assertion class
     // THE FOURTH ARM, and the fix REQUIRED it (2026-09-17). Town issuance is the
     // same in-place assertion class as a gift — `MINT → <treasury> · n · for:
     // issuance:…` — and it was missing here. It went unnoticed because it
@@ -887,6 +1096,21 @@ export function deriveTransfers(deliveries, households, { laws = [], revisions =
     // SETTLEMENT DIVERGES. Two folds, one law: they have to agree by
     // construction. Same reason as the three above, one ruling later.
     else if (c.kind === 'holo') add(c.handle, c.n);            // the givers' reward, liquid since 2026-09-17
+    // THE POST ARMS (POS-290, 2026-10-09). The other two holders key on the raw
+    // movement shape, and every post line is movement-shaped, so they needed no
+    // change; this fold names kinds, so each one is written here. `post-stage`
+    // was missing too: a bug's stage stamps landed on the ledger from 10-07 (68
+    // lines by 10-09) and this fold did not credit them, so a stage-paid
+    // resident's `pays:` letter could be written `void: insufficient-balance`
+    // where the verifier's running fold expects a transfer (SETTLEMENT
+    // DIVERGES). No settlement has depended on it yet; the arm is the fix.
+    else if (c.kind === 'post-stage') add(c.handle, c.n);      // a bug's stage stamps
+    else if (c.kind === 'post-award') add(c.handle, c.n);      // an award on an idea post
+    else if (c.kind === 'post-recredit') add(c.handle, c.n);   // a stage paid again, to the right resident (POS-649)
+    else if (c.kind === 'correction-burn') add(c.handle, -c.n); // the wrong stage mint, burned (POS-649)
+    else if (c.kind === 'post-stake') add(c.handle, -c.n);     // post escrow out
+    else if (c.kind === 'post-unstake') add(c.handle, c.n);    // the staker's own way out
+    else if (c.kind === 'post-return') add(c.handle, c.n);     // the finished post's return, whole
     // AND THE KNOWN GAP IS CLOSED. This arm's first version said `pot-unstake`
     // and the world-mark pair were "deliberately NOT here … reported on #2811
     // rather than repaired in this lane". #2887 repaired them, and its merge is
@@ -976,6 +1200,112 @@ export const welcomeLine = ({ date, handle, household }) => {
     throw new Error(`welcome: the household must be a key of the form <prefix>:<value> ([a-z0-9-]:[a-z0-9._-]), got ${JSON.stringify(household)}`);
   return `- ${date} · MINT → ${handle} · 5 · for: welcome:${household} · by: the-town`;
 };
+
+// A quest pay's canonical line. The amount and `the-town` are PINNED here from
+// QUEST_PAY, and the quest id and the household key are checked against their
+// classes before they are written (a `·` in either would forge the fields behind it).
+export const questPayLine = ({ date, handle, quest, household }) => {
+  const terms = QUEST_PAY[quest];
+  if (!terms) throw new Error(`quest pay: "${quest}" is not a paid quest (${Object.keys(QUEST_PAY).join(', ')})`);
+  if (!HOUSEHOLD_KEY_RE.test(String(household ?? '')))
+    throw new Error(`quest pay: the household must be a key of the form <prefix>:<value>, got ${JSON.stringify(household)}`);
+  return `- ${date} · MINT → ${handle} · ${terms.amount} · for: quest:${quest}/${household} · by: the-town`;
+};
+
+// A bug stage's canonical line. `the-town` is PINNED here the way welcomeLine
+// pins it, and the amount must be on the ladder for the stage: the stage's
+// terms are not a caller's choice. The post id is checked against its class
+// before it is written, so a post id carrying the `·` separator cannot forge
+// the `by:` field behind it.
+export const stageMintLine = ({ date, handle, n, post, stage }) => {
+  if (!STAGE_POST_ID_RE.test(String(post ?? '')))
+    throw new Error(`stage mint: the post must be a post id, <author>/<slug>, got ${JSON.stringify(post)}`);
+  const rung = STAGE_LADDER[stage];
+  if (!rung) throw new Error(`stage mint: "${stage}" is not a paid stage (${Object.keys(STAGE_LADDER).join(', ')})`);
+  if (!rung.includes(n)) throw new Error(`stage mint: ${stage} pays ${rung.join(' or ')}, not ${n}`);
+  return `- ${date} · MINT → ${handle} · ${n} · for: post:${post}/${stage} · by: the-town`;
+};
+
+/**
+ * The correction's two lines, in their one order (POS-649). `wrong` is the
+ * stage's own line, classified: { handle, n, post, stage } plus its `sig`.
+ * Refuses what would forge or misfile either line.
+ */
+export const stageRecreditLines = ({ date, handle, wrong, by }) => {
+  const { post, stage, n, sig } = wrong ?? {};
+  if (!STAGE_POST_ID_RE.test(String(post ?? '')))
+    throw new Error(`stage recredit: the post must be a post id, <author>/<slug>, got ${JSON.stringify(post)}`);
+  if (!RECREDIT_STAGES.includes(stage)) throw new Error(`stage recredit: only ${RECREDIT_STAGES.join(', ')} are re-credited, not ${JSON.stringify(stage)}`);
+  if (!(STAGE_LADDER[stage] ?? []).includes(n)) throw new Error(`stage recredit: ${stage} pays ${STAGE_LADDER[stage].join(' or ')}, not ${n}`);
+  if (!SIG_RE.test(String(sig ?? ''))) throw new Error(`stage recredit: the wrong mint is named by its full signature, got ${JSON.stringify(sig)}`);
+  if (!/^[^\s·]+$/.test(String(handle ?? '')) || !/^[^\s·]+$/.test(String(wrong.handle ?? '')))
+    throw new Error('stage recredit: a handle is one token with no "·"');
+  if (handle === wrong.handle) throw new Error(`stage recredit: post:${post}/${stage} already paid ${handle}; a recredit pays someone else`);
+  if (!CORRECTION_HANDS.includes(by)) throw new Error(`stage recredit: by: must be one of the hands (${CORRECTION_HANDS.join(', ')}), got ${JSON.stringify(by)}`);
+  return [
+    `- ${date} · MINT → ${handle} · ${n} · for: post:${post}/${stage}-recredit · by: the-town`,
+    `- ${date} · ${wrong.handle} → BURN · ${n} · for: correction:${sig} · by: ${by}`,
+  ];
+};
+
+/**
+ * A meep's stage mints, burned (POS-655; Darko 2026-10-16 20:04 EDT: "meeps
+ * are credited, not paid"). `wrongs` are the post's stage lines paid to the
+ * meep, classified, each with its `sig`: one burn per mint, in their order,
+ * the same line a stage correction's burn is. There is no recredit: the meep's
+ * finding and credit stay on the post, and no one else earned the stage.
+ */
+export const meepCorrectionLines = ({ date, wrongs, by }) => {
+  if (!Array.isArray(wrongs) || !wrongs.length) throw new Error('meep correction: no stage mint to burn');
+  if (!CORRECTION_HANDS.includes(by)) throw new Error(`meep correction: by: must be one of the hands (${CORRECTION_HANDS.join(', ')}), got ${JSON.stringify(by)}`);
+  return wrongs.map((w) => {
+    if (!RECREDIT_STAGES.includes(w.stage) && !Object.hasOwn(STAGE_LADDER, w.stage)) throw new Error(`meep correction: ${JSON.stringify(w.stage)} is no bug stage`);
+    if (!SIG_RE.test(String(w.sig ?? ''))) throw new Error(`meep correction: a mint is named by its full signature, got ${JSON.stringify(w.sig)}`);
+    if (!/^[^\s·]+$/.test(String(w.handle ?? ''))) throw new Error('meep correction: a handle is one token with no "·"');
+    return `- ${date} · ${w.handle} → BURN · ${w.n} · for: correction:${w.sig} · by: ${by}`;
+  });
+};
+
+// The idea posts' four lines (POS-290). Each builder refuses what would forge or
+// misfile its line: a post id or a channel carrying the field separator, a label
+// that is a stage's name (it would be read as a stage line), an amount outside
+// the law, a hand who is not one, a side that is neither.
+const postIdOf = (what, post) => {
+  if (!STAGE_POST_ID_RE.test(String(post ?? '')))
+    throw new Error(`${what}: the post must be a post id, <author>/<slug>, got ${JSON.stringify(post)}`);
+  return post;
+};
+const wholeOf = (what, n) => {
+  if (!Number.isInteger(n) || n < 1) throw new Error(`${what}: the amount must be a whole number ≥ 1, got ${JSON.stringify(n)}`);
+  return n;
+};
+const viaOf = (what, via) => {
+  if (!/^[^\s·]+$/.test(String(via ?? ''))) throw new Error(`${what}: the channel must be one token with no "·", got ${JSON.stringify(via)}`);
+  return via;
+};
+export const awardMintLine = ({ date, handle, n, post, label, by }) => {
+  postIdOf('award', post);
+  if (!AWARD_LABEL_RE.test(String(label ?? '')))
+    throw new Error(`award: the label must be kebab-case, 1 to 40 characters ([a-z0-9][a-z0-9-]*), got ${JSON.stringify(label)}`);
+  if (Object.hasOwn(STAGE_LADDER, label))
+    throw new Error(`award: "${label}" is a bug stage's name, and a line with it would read as stage stamps; choose another label`);
+  if (RECREDIT_STAGES.some((st) => label === `${st}-recredit`))
+    throw new Error(`award: "${label}" is a stage correction's name, and a line with it would read as one; choose another label`);
+  wholeOf('award', n);
+  if (n > AWARD_MAX) throw new Error(`award: ${n} is over the most one award may pay (${AWARD_MAX})`);
+  if (!AWARD_HANDS.includes(by)) throw new Error(`award: by: must be one of the hands (${AWARD_HANDS.join(', ')}), got ${JSON.stringify(by)}`);
+  return `- ${date} · MINT → ${handle} · ${n} · for: post:${post}/${label} · by: ${by}`;
+};
+export const postStakeLine = ({ date, handle, post, n, side, via }) => {
+  postIdOf('post stake', post);
+  wholeOf('post stake', n);
+  if (side !== 'for' && side !== 'against') throw new Error(`post stake: the side is for or against, got ${JSON.stringify(side)}`);
+  return `- ${date} · ${handle} → stake:post/${post} · ${n} · side: ${side} · via: ${viaOf('post stake', via)}`;
+};
+export const postUnstakeLine = ({ date, post, handle, n, via }) =>
+  `- ${date} · stake:post/${postIdOf('post unstake', post)} → ${handle} · ${wholeOf('post unstake', n)} · for: unstake · via: ${viaOf('post unstake', via)}`;
+export const postReturnLine = ({ date, post, handle, n }) =>
+  `- ${date} · stake:post/${postIdOf('post return', post)} → ${handle} · ${wholeOf('post return', n)} · for: post-return`;
 
 // A town-issuance line. `note` is the provenance wording, supplied at the door;
 // it is the terminal free-text field, so the separator guard here is a forgery
@@ -1098,6 +1428,9 @@ export function signSeal(sealHex, privateKeyPem) {
 // that debit is not cosmetic: conservation is structural here (stamp-verify
 // sums every account and demands 0), so crediting the payer without debiting
 // MINT would break the conservation check by exactly the holo minted.
+// The idea posts' four lines (POS-290) are all movement-shaped, so this fold
+// takes them by their arrow with no arm of its own: the award from MINT, the
+// stake into `stake:post/<id>`, the unstake and the return out of it.
 export function foldBalances(entries) {
   const bal = new Map(); // account -> n ; MINT, BURN and stake:* are accounts too
   const add = (acct, n) => bal.set(acct, (bal.get(acct) ?? 0) + n);
@@ -1193,8 +1526,9 @@ export function foldStaked(entries) {
     // by the same amount. The only thing it does NOT share with pot-return is
     // the closed-epoch marker; that difference lives in foldClosedEpochs, not
     // here, because the tenses do not care WHY escrow ended.
-    if (c.kind === 'stake' || c.kind === 'world-stake' || c.kind === 'pot-stake') st.set(c.handle, (st.get(c.handle) ?? 0) + c.n);
-    else if (c.kind === 'return' || c.kind === 'world-unstake' || c.kind === 'pot-return' || c.kind === 'pot-unstake' || c.kind === 'keeping-burn') st.set(c.handle, (st.get(c.handle) ?? 0) - c.n);
+    // Post stakes are the fourth member, for the same reason (POS-290).
+    if (c.kind === 'stake' || c.kind === 'world-stake' || c.kind === 'pot-stake' || c.kind === 'post-stake') st.set(c.handle, (st.get(c.handle) ?? 0) + c.n);
+    else if (c.kind === 'return' || c.kind === 'world-unstake' || c.kind === 'pot-return' || c.kind === 'pot-unstake' || c.kind === 'keeping-burn' || c.kind === 'post-unstake' || c.kind === 'post-return') st.set(c.handle, (st.get(c.handle) ?? 0) - c.n);
   }
   return st;
 }
@@ -1883,7 +2217,7 @@ function loadState(repo) {
   return { ledgerPath, existing, laws, revisions, deliveries, mints, transfers };
 }
 
-function main() {
+function main(registrySource = null) {
   const repo = resolve(arg('--repo') ?? DEFAULT_REPO);
   const { ledgerPath, existing, deliveries, mints, transfers } = loadState(repo);
   const genesisDate = deliveries[0]?.date ?? '2026-06-12';
@@ -2049,6 +2383,30 @@ function main() {
     return;
   }
 
+  // THE STORE'S REGISTRY (POS-344/345): --registry <file|url>, read once at
+  // the entry by tools/registry-source.mjs (an unreadable one has already
+  // refused there, never falling back to the printouts).
+  const welcomeRegistry = () => (registrySource
+    ? { households: registrySource.registry.households ?? {}, pins: registrySource.pins ?? {} }
+    : null);
+
+  // THE STORE'S KEY BASE, handed over by the office (POS-341 part 4): --base
+  // <file> is householdKeys' answer read from the store, as `{ <handle>: { key,
+  // provisional } }`. The welcome's roll and its house check read it in place
+  // of the printouts'; the law that folds it stays here. Without --base this is
+  // householdKeys(repo), as before. An unreadable file is a refusal.
+  const keyBase = () => {
+    const p = arg('--base');
+    if (!p) return null;
+    let doc;
+    try { doc = JSON.parse(readFileSync(p, 'utf8')); }
+    catch (e) { console.error(`FATAL: --base ${p} could not be read (${e.message}) — nothing planned, nothing minted`); process.exit(1); }
+    const ok = doc && typeof doc === 'object' && !Array.isArray(doc)
+      && Object.values(doc).every((r) => r && typeof r.key === 'string' && HOUSEHOLD_KEY_RE.test(r.key) && typeof r.provisional === 'boolean');
+    if (!ok) { console.error(`FATAL: --base ${p} is not { <handle>: { key, provisional } } — nothing planned, nothing minted`); process.exit(1); }
+    return new Map(Object.entries(doc));
+  };
+
   // ── the welcome bundle (founder-ruled 2026-09-14) ──────────────────────────
   //
   // THE PLAN comes first, and it is a DRY RUN: it writes nothing, signs nothing
@@ -2061,13 +2419,16 @@ function main() {
   // the household's residents, ties alphabetical. A resident carrying no pin has
   // no date to be early with, so they sort AFTER every pinned housemate and
   // alphabetically among themselves — a missing pin is an absent answer, never
-  // an early one.
+  // an early one. The pins are the store's when the office hands them over
+  // with --registry (POS-344), and the printout's otherwise. The roll's key
+  // base is the store's with --base (POS-341 part 4), and householdKeys' otherwise.
   if (has('--welcome-plan')) {
-    const roll = currentHouseholds(repo);
+    const roll = currentHouseholds(repo, { base: keyBase() });
     const { laws } = parseLaws(existing);
     const isMeep = meepChecker(laws);
     const today = arg('--date') ?? new Intl.DateTimeFormat('en-CA', { timeZone: process.env.TOWN_TZ ?? 'America/New_York' }).format(new Date());
-    const pins = (() => {
+    const registry = welcomeRegistry();
+    const pins = registry ? (registry.pins ?? {}) : (() => {
       try { return JSON.parse(readFileSync(join(repo, 'tools', 'github-ids.json'), 'utf8')); }
       catch { return {}; }
     })();
@@ -2092,7 +2453,20 @@ function main() {
       if (!byHouse.has(rec.key)) byHouse.set(rec.key, []);
       byHouse.get(rec.key).push(handle);
     }
-    const owed = [], held = [];
+    // THE HOUSE, NOT THE SPELLING (Postmark Auth, 2026-09-29). A welcome paid
+    // to any resident of a declared house marks the whole house paid, whatever
+    // key string either resident wears. Wildcat (09-28) and Scout (09-29) were
+    // each paid a second bundle because their key was a GitHub-username spelling
+    // of an account their house had already been paid under.
+    const binding = welcomeBinding(repo, registry);
+    const paidHouses = new Map(); // declared slug -> the line that paid it
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind !== 'welcome') continue;
+      const slug = binding.houseOf(c.handle);
+      if (slug && !paidHouses.has(slug)) paidHouses.set(slug, c);
+    }
+    const owed = [], held = [], waiting = [];
     for (const key of [...byHouse.keys()].sort()) {
       const residents = byHouse.get(key).slice().sort();
       const first = residents.slice().sort((a, b) => {
@@ -2102,13 +2476,28 @@ function main() {
         if (!pa && pb) return 1;
         return a.localeCompare(b);
       })[0];
-      (paid.has(key) ? held : owed).push({ key, residents, first, by: paid.get(key) ?? null });
+      const houseLine = residents.map((h) => paidHouses.get(binding.houseOf(h))).find(Boolean);
+      const by = paid.get(key) ?? houseLine ?? null;
+      if (by) held.push({ key, residents, first, by });
+      // ONLY A BOUND RESIDENT IS PAID. A resident with no GitHub id on record
+      // wears a GitHub-username spelling, and the once-per-household check
+      // cannot see through it. They wait, and the first tick after the bind
+      // pays the house once, or finds it already paid.
+      else if (!residents.some((h) => binding.bound(h))) waiting.push({ key, residents });
+      else owed.push({ key, residents, first: binding.bound(first) ? first : residents.find((h) => binding.bound(h)), by: null });
     }
     console.log(`welcome plan — ${byHouse.size} household(s) in the roll, ${held.length} already welcomed, ${owed.length} owed`);
     console.log(`  (5 stamps each; ${owed.length * 5} stamps in total if every owed bundle is written)`);
     if (owed.length) console.log('\nOWED — first resident · household · (residents)');
     for (const o of owed) {
       console.log(`  ${o.first} · ${o.key} · (${o.residents.join(', ')})${pinnedOf(o.first) ? ` · pinned ${pinnedOf(o.first)}` : ' · no pin'}`);
+    }
+    // After OWED and its blank line, so the office's plan parser, which reads
+    // the OWED rows up to the first blank line, never mistakes a waiting house
+    // for an owed one. The header's counts are unchanged in shape.
+    if (waiting.length) {
+      console.log('\nWAITING FOR A BIND — household · (residents)');
+      for (const w of waiting) console.log(`  ${w.key} · (${w.residents.join(', ')}) · no GitHub id on record: bind the resident, and the next tick pays the house once`);
     }
     if (held.length) {
       console.log('\nALREADY WELCOMED');
@@ -2135,7 +2524,7 @@ function main() {
     if (!HOUSEHOLD_KEY_RE.test(household)) {
       console.error(`--household must be a household key, <prefix>:<value> ([a-z0-9-]:[a-z0-9._-], got "${household}")`); process.exit(1);
     }
-    const rooms = householdKeys(repo);
+    const rooms = keyBase() ?? householdKeys(repo);
     if (!rooms.has(handle)) { console.error(`FATAL: no WHITE_PAGES room for "${handle}" — a welcome bundle needs a resident to receive it`); process.exit(1); }
     const { laws, revisions } = parseLaws(existing);
     if (meepChecker(laws)(handle, date)) { console.error(`FATAL: "${handle}" is a meep at ${date} — meeps stay outside the currency`); process.exit(1); }
@@ -2152,9 +2541,15 @@ function main() {
     if (household !== mine) {
       console.error(`FATAL: --household ${household} is not "${handle}"'s household at ${date} (${mine}) — the bundle is paid to a house, and the line must name the house it paid`); process.exit(1);
     }
+    const binding = welcomeBinding(repo, welcomeRegistry());
+    if (!binding.bound(handle)) {
+      console.error(`FATAL: "${handle}" has no GitHub id on record (${arg('--registry') ? 'the store\'s pins' : 'tools/github-ids.json'}) — only a bound resident is welcomed; bind them first, and the next pass pays their house once`); process.exit(1);
+    }
+    const myHouse = binding.houseOf(handle);
     for (const e of existing) {
       const c = classifyEntry(e.canonical);
-      if (c.kind === 'welcome' && (c.household === mine || keyOf(c.handle, c.date) === mine)) {
+      if (c.kind === 'welcome' && (c.household === mine || keyOf(c.handle, c.date) === mine
+          || (myHouse && binding.houseOf(c.handle) === myHouse))) {
         console.error(`FATAL: household already holds its welcome bundle (${c.date}, ${c.handle}, welcome:${c.household}) — once per household, ever`); process.exit(1);
       }
     }
@@ -2174,6 +2569,319 @@ function main() {
     const canonical = welcomeLine({ date, handle, household });
     appendSigned(repo, [canonical], readFileSync(keyPath, 'utf8'));
     console.log(`stamp-ledger: welcome bundle minted\n  ${canonical}`);
+    return;
+  }
+
+  if (has('--quest-mint')) {
+    // A QUEST THE TOWN PAYS (POS-632). Same ceremony as --welcome — signed by the
+    // office pen, appended onto a settled tail, forward-dated — with the quest's
+    // terms held here AND at verify, from QUEST_PAY: the amount (no --amount),
+    // authority the-town (no --by), the window, the meep law, the named household
+    // IS the recipient's at this date, and ONE line per quest and household, ever.
+    // The writer is the office's reviewed quest pass (quest-pay-plan.mjs --apply),
+    // run by hand; this verb is that ceremony, never a second law.
+    const keyPath = arg('--key');
+    const date = arg('--date');
+    const handle = arg('--quest-mint');
+    const quest = arg('--quest');
+    const household = arg('--household');
+    if (!keyPath || !existsSync(keyPath) || !date || !handle || !quest || !household) {
+      console.error('--quest-mint <handle> needs --quest <id> --household <key> --date YYYY-MM-DD --key FILE'); process.exit(1);
+    }
+    const terms = QUEST_PAY[quest];
+    if (!terms) { console.error(`FATAL: "${quest}" is not a paid quest (${Object.keys(QUEST_PAY).join(', ')})`); process.exit(1); }
+    if (date < terms.from || (terms.until && date > terms.until)) {
+      console.error(`FATAL: ${quest} pays from ${terms.from}${terms.until ? ` until ${terms.until}` : ''}, not on ${date}`); process.exit(1);
+    }
+    if (!HOUSEHOLD_KEY_RE.test(household)) {
+      console.error(`--household must be a household key, <prefix>:<value> (got "${household}")`); process.exit(1);
+    }
+    const rooms = keyBase() ?? householdKeys(repo);
+    if (!rooms.has(handle)) { console.error(`FATAL: no WHITE_PAGES room for "${handle}" — a quest pays a resident`); process.exit(1); }
+    const { laws, revisions } = parseLaws(existing);
+    if (meepChecker(laws)(handle, date)) { console.error(`FATAL: "${handle}" is a meep at ${date} — meeps stay outside the currency`); process.exit(1); }
+    const keyOf = (h, d) => {
+      let k = null;
+      for (const r of revisions) if (r.handle === h && r.date <= d) k = r.key;
+      if (k) return k;
+      const base = rooms.get(h);
+      return base ? base.key : `solo:${h}`;
+    };
+    const mine = keyOf(handle, date);
+    if (household !== mine) {
+      console.error(`FATAL: --household ${household} is not "${handle}"'s household at ${date} (${mine}) — the quest is paid to a house, and the line must name the house it paid`); process.exit(1);
+    }
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'quest-pay' && c.quest === quest && (c.household === mine || keyOf(c.handle, c.date) === mine)) {
+        console.error(`FATAL: household already paid for quest:${quest} (${c.date}, ${c.handle}) — one line per quest and household, ever`); process.exit(1);
+      }
+    }
+    const recorded = existing.map((e) => e.canonical);
+    const { problems, owed } = walkLedger(recorded.slice(1), mints, 1);
+    if (existing.length > 0 && problems.length) {
+      console.error(`FATAL: recorded ledger diverges from derivation — run stamp-verify.mjs; nothing minted\n${problems[0]}`); process.exit(1);
+    }
+    if (existing.length === 0 || owed.length) {
+      console.error(`FATAL: ledger is behind the mail (${owed.length} mint(s) owed${existing.length === 0 ? ', or not yet founded' : ''}) — run --append first, then mint onto the settled tail`); process.exit(1);
+    }
+    const maxDate = existing.reduce((mx, e) => {
+      const d = /^- (\d{4}-\d{2}-\d{2}) /.exec(e.canonical)?.[1];
+      return d && d > mx ? d : mx;
+    }, '0000-00-00');
+    if (date < maxDate) { console.error(`FATAL: quest date ${date} precedes the ledger tail (${maxDate}) — the ledger is append-only, forward-dated`); process.exit(1); }
+    const canonical = questPayLine({ date, handle, quest, household });
+    appendSigned(repo, [canonical], readFileSync(keyPath, 'utf8'));
+    console.log(`stamp-ledger: quest paid\n  ${canonical}`);
+    return;
+  }
+
+  if (has('--stage-mint')) {
+    // A BUG'S STAGE STAMPS. Same ceremony as --welcome — signed by the office
+    // pen, appended onto a settled tail, forward-dated — with the stage's terms
+    // held here AND at verify: the amount on the ladder for its stage, authority
+    // the-town (no --by), the meep law, and ONE line per post and stage, ever.
+    // The writer is the office's reviewed stage pass (bug-stage-plan.mjs
+    // --apply), run by hand; this verb is that ceremony, never a second law.
+    const keyPath = arg('--key');
+    const date = arg('--date');
+    const handle = arg('--stage-mint');
+    const post = arg('--post');
+    const stage = arg('--stage');
+    const n = Number(arg('--amount'));
+    if (!keyPath || !existsSync(keyPath) || !date || !handle || !post || !stage || !arg('--amount')) {
+      console.error('--stage-mint <handle> needs --post <author>/<slug> --stage <stage> --amount N --date YYYY-MM-DD --key FILE'); process.exit(1);
+    }
+    if (!STAGE_POST_ID_RE.test(post)) { console.error(`--post must be a post id, <author>/<slug> (got "${post}")`); process.exit(1); }
+    if (!STAGE_LADDER[stage]) { console.error(`FATAL: "${stage}" is not a paid stage — the ladder pays ${Object.keys(STAGE_LADDER).join(', ')}`); process.exit(1); }
+    if (!STAGE_LADDER[stage].includes(n)) { console.error(`FATAL: ${stage} pays ${STAGE_LADDER[stage].join(' or ')}, not ${arg('--amount')} — the ladder is the law, not the caller's number`); process.exit(1); }
+    const rooms = householdKeys(repo);
+    if (!rooms.has(handle)) { console.error(`FATAL: no WHITE_PAGES room for "${handle}" — a stage mint needs a resident to receive it`); process.exit(1); }
+    const { laws } = parseLaws(existing);
+    if (meepChecker(laws)(handle, date)) { console.error(`FATAL: "${handle}" is a meep at ${date} — meeps stay outside the currency`); process.exit(1); }
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'post-stage' && c.post === post && c.stage === stage) {
+        console.error(`FATAL: post:${post}/${stage} is already paid (${c.date}, ${c.n} to ${c.handle}) — one line per post and stage, ever`); process.exit(1);
+      }
+    }
+    const recorded = existing.map((e) => e.canonical);
+    const { problems, owed } = walkLedger(recorded.slice(1), mints, 1);
+    if (existing.length > 0 && problems.length) {
+      console.error(`FATAL: recorded ledger diverges from derivation — run stamp-verify.mjs; nothing minted\n${problems[0]}`); process.exit(1);
+    }
+    if (existing.length === 0 || owed.length) {
+      console.error(`FATAL: ledger is behind the mail (${owed.length} mint(s) owed${existing.length === 0 ? ', or not yet founded' : ''}) — run --append first, then mint onto the settled tail`); process.exit(1);
+    }
+    const maxDate = existing.reduce((mx, e) => {
+      const d = /^- (\d{4}-\d{2}-\d{2}) /.exec(e.canonical)?.[1];
+      return d && d > mx ? d : mx;
+    }, '0000-00-00');
+    if (date < maxDate) { console.error(`FATAL: stage-mint date ${date} precedes the ledger tail (${maxDate}) — the ledger is append-only, forward-dated`); process.exit(1); }
+    const canonical = stageMintLine({ date, handle, n, post, stage });
+    appendSigned(repo, [canonical], readFileSync(keyPath, 'utf8'));
+    console.log(`stamp-ledger: stage stamps minted\n  ${canonical}`);
+    return;
+  }
+
+  if (has('--stage-recredit')) {
+    // A BUG STAGE'S CORRECTION (POS-649). The stage was paid to the wrong
+    // resident: pay it again to the right one and burn the wrong mint, exactly,
+    // in ONE append, or neither. The ceremony is --stage-mint's (signed by the
+    // office pen, onto a settled tail, forward-dated); the terms are held here
+    // AND at verify: the stage's own line exists and is the one burned, the same
+    // amount, a different and non-meep recipient with a room, the wrong
+    // recipient's LIQUID balance covers the burn, a hand's by:, and ONE
+    // correction per post and stage and per mint, ever. --amount and --from are
+    // the caller's binds: the office's plan says what it expects, and a ledger
+    // that disagrees refuses rather than burning something else.
+    const keyPath = arg('--key');
+    const date = arg('--date');
+    const handle = arg('--stage-recredit');
+    const post = arg('--post');
+    const stage = arg('--stage');
+    const by = arg('--by');
+    if (!keyPath || !existsSync(keyPath) || !date || !handle || !post || !stage || !by) {
+      console.error('--stage-recredit <handle> needs --post <author>/<slug> --stage <stage> --by <hand> --date YYYY-MM-DD --key FILE [--amount N --from <handle>]'); process.exit(1);
+    }
+    if (!STAGE_POST_ID_RE.test(post)) { console.error(`--post must be a post id, <author>/<slug> (got "${post}")`); process.exit(1); }
+    if (!RECREDIT_STAGES.includes(stage)) { console.error(`FATAL: only ${RECREDIT_STAGES.join(', ')} are re-credited, not "${stage}"`); process.exit(1); }
+    let wrong = null;
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'post-stage' && c.post === post && c.stage === stage) wrong = { ...c, sig: e.sig };
+      if (c.kind === 'post-recredit' && c.post === post && c.stage === stage) {
+        console.error(`FATAL: post:${post}/${stage} was already re-credited (${c.date}, ${c.n} to ${c.handle}) — one correction per post and stage, ever`); process.exit(1);
+      }
+    }
+    if (!wrong) { console.error(`FATAL: post:${post}/${stage} was never paid — there is no stage line to correct`); process.exit(1); }
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'correction-burn' && c.sig === wrong.sig) {
+        console.error(`FATAL: the mint post:${post}/${stage} (${wrong.sig.slice(0, 16)}…) was already burned (${c.date}) — one burn per mint, ever`); process.exit(1);
+      }
+    }
+    if (arg('--amount') != null && Number(arg('--amount')) !== wrong.n) {
+      console.error(`FATAL: the plan expects ${arg('--amount')} and post:${post}/${stage} paid ${wrong.n} — refusing to correct a line the plan did not read`); process.exit(1);
+    }
+    if (arg('--from') != null && arg('--from') !== wrong.handle) {
+      console.error(`FATAL: the plan expects the wrong mint to be ${arg('--from')}'s and post:${post}/${stage} paid ${wrong.handle} — refusing to correct a line the plan did not read`); process.exit(1);
+    }
+    let lines;
+    try { lines = stageRecreditLines({ date, handle, wrong, by }); }
+    catch (e) { console.error(`FATAL: ${e.message}`); process.exit(1); }
+    const rooms = householdKeys(repo);
+    if (!rooms.has(handle)) { console.error(`FATAL: no WHITE_PAGES room for "${handle}" — a recredit needs a resident to receive it`); process.exit(1); }
+    const { laws } = parseLaws(existing);
+    if (meepChecker(laws)(handle, date)) { console.error(`FATAL: "${handle}" is a meep at ${date} — meeps stay outside the currency`); process.exit(1); }
+    const liquid = foldBalances(existing).get(wrong.handle) ?? 0;
+    if (liquid < wrong.n) {
+      console.error(`FATAL: ${wrong.handle} holds ${liquid} liquid stamp(s) and the wrong mint was ${wrong.n} — a correction burns liquid stamps only, never escrow; nothing written`); process.exit(1);
+    }
+    const recorded = existing.map((e) => e.canonical);
+    const { problems, owed } = walkLedger(recorded.slice(1), mints, 1);
+    if (existing.length > 0 && problems.length) {
+      console.error(`FATAL: recorded ledger diverges from derivation — run stamp-verify.mjs; nothing minted\n${problems[0]}`); process.exit(1);
+    }
+    const settledIds = new Set();
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'transfer' || c.kind === 'void') settledIds.add(c.id);
+    }
+    const owedSettlements = transfers.filter((t) => !settledIds.has(t.id));
+    if (existing.length === 0 || owed.length || owedSettlements.length) {
+      console.error(`FATAL: ledger is behind the mail (${owed.length} mint(s), ${owedSettlements.length} settlement(s) owed${existing.length === 0 ? ', or not yet founded' : ''}) — run --append first, then correct onto the settled tail`); process.exit(1);
+    }
+    const maxDate = existing.reduce((mx, e) => {
+      const d = /^- (\d{4}-\d{2}-\d{2}) /.exec(e.canonical)?.[1];
+      return d && d > mx ? d : mx;
+    }, '0000-00-00');
+    if (date < maxDate) { console.error(`FATAL: recredit date ${date} precedes the ledger tail (${maxDate}) — the ledger is append-only, forward-dated`); process.exit(1); }
+    appendSigned(repo, lines, readFileSync(keyPath, 'utf8'));
+    console.log(`stamp-ledger: stage re-credited, the wrong mint burned\n  ${lines.join('\n  ')}`);
+    return;
+  }
+
+  if (has('--meep-correction')) {
+    // A MEEP'S STAGE MINTS, BURNED (POS-655). Every stage line of the post
+    // that paid the meep is burned, exactly, by its full signature, in ONE
+    // append, or none is. The meep must be a meep by the law in force at the
+    // burn's date (a rules line names it), the burns come from liquid stamps
+    // only, and a mint already burned refuses. The ceremony is --stage-
+    // recredit's: signed by the office pen, onto a settled tail, forward-dated.
+    // --amount is the caller's bind: the total it expects to burn.
+    const keyPath = arg('--key');
+    const date = arg('--date');
+    const handle = arg('--meep-correction');
+    const post = arg('--post');
+    const by = arg('--by');
+    if (!keyPath || !existsSync(keyPath) || !date || !handle || !post || !by) {
+      console.error('--meep-correction <meep> needs --post <author>/<slug> --by <hand> --date YYYY-MM-DD --key FILE [--amount N]'); process.exit(1);
+    }
+    if (!STAGE_POST_ID_RE.test(post)) { console.error(`--post must be a post id, <author>/<slug> (got "${post}")`); process.exit(1); }
+    const { laws } = parseLaws(existing);
+    if (!meepChecker(laws)(handle, date)) {
+      console.error(`FATAL: "${handle}" is not a meep at ${date} — the law in force names no such meep; declare the meep set first (--declare-rules), then burn`); process.exit(1);
+    }
+    const wrongs = [];
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'post-stage' && c.post === post && c.handle === handle) wrongs.push({ ...c, sig: e.sig });
+    }
+    if (!wrongs.length) { console.error(`FATAL: no stage line of post:${post} paid "${handle}" — there is nothing to burn`); process.exit(1); }
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'correction-burn' && wrongs.some((w) => w.sig === c.sig)) {
+        console.error(`FATAL: a stage mint of post:${post} (${c.sig.slice(0, 16)}…) was already burned (${c.date}) — one burn per mint, ever`); process.exit(1);
+      }
+    }
+    const total = wrongs.reduce((a, w) => a + w.n, 0);
+    if (arg('--amount') != null && Number(arg('--amount')) !== total) {
+      console.error(`FATAL: the caller expects to burn ${arg('--amount')} and post:${post} paid ${handle} ${total} — refusing to burn a set the caller did not read`); process.exit(1);
+    }
+    let lines;
+    try { lines = meepCorrectionLines({ date, wrongs, by }); }
+    catch (e) { console.error(`FATAL: ${e.message}`); process.exit(1); }
+    const liquid = foldBalances(existing).get(handle) ?? 0;
+    if (liquid < total) {
+      console.error(`FATAL: ${handle} holds ${liquid} liquid stamp(s) and the burn is ${total} — a correction burns liquid stamps only, never escrow; nothing written`); process.exit(1);
+    }
+    const recorded = existing.map((e) => e.canonical);
+    const { problems, owed } = walkLedger(recorded.slice(1), mints, 1);
+    if (existing.length > 0 && problems.length) {
+      console.error(`FATAL: recorded ledger diverges from derivation — run stamp-verify.mjs; nothing burned\n${problems[0]}`); process.exit(1);
+    }
+    const settledIds = new Set();
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'transfer' || c.kind === 'void') settledIds.add(c.id);
+    }
+    const owedSettlements = transfers.filter((t) => !settledIds.has(t.id));
+    if (owed.length || owedSettlements.length) {
+      console.error(`FATAL: ledger is behind the mail (${owed.length} mint(s), ${owedSettlements.length} settlement(s) owed) — run --append first, then burn onto the settled tail`); process.exit(1);
+    }
+    const maxDate = existing.reduce((mx, e) => {
+      const d = /^- (\d{4}-\d{2}-\d{2}) /.exec(e.canonical)?.[1];
+      return d && d > mx ? d : mx;
+    }, '0000-00-00');
+    if (date < maxDate) { console.error(`FATAL: burn date ${date} precedes the ledger tail (${maxDate}) — the ledger is append-only, forward-dated`); process.exit(1); }
+    appendSigned(repo, lines, readFileSync(keyPath, 'utf8'));
+    console.log(`stamp-ledger: ${handle}'s stage mints of post:${post} burned (${total}; the meep law)\n  ${lines.join('\n  ')}`);
+    return;
+  }
+
+  if (has('--award-mint')) {
+    // AN AWARD ON AN IDEA POST (POS-290). The ceremony is --gift's — signed by
+    // the office pen, onto a settled tail (no mint and no settlement owed, since
+    // an award funds later `pays:` letters like a gift does), forward-dated —
+    // with the award's terms held here AND at verify: a hand's `by:`, 1..AWARD_MAX,
+    // a label that is no stage's name, the meep law, and ONE line per post and
+    // label, ever. The amount is the caller's: the act a hand recorded at the
+    // office. The writer is the office's reviewed award pass, run by hand.
+    const keyPath = arg('--key');
+    const date = arg('--date');
+    const handle = arg('--award-mint');
+    const post = arg('--post');
+    const label = arg('--label');
+    const by = arg('--by');
+    const n = Number(arg('--amount'));
+    if (!keyPath || !existsSync(keyPath) || !date || !handle || !post || !label || !by || !arg('--amount')) {
+      console.error('--award-mint <handle> needs --post <author>/<slug> --label <label> --amount N --by <hand> --date YYYY-MM-DD --key FILE'); process.exit(1);
+    }
+    let canonical;
+    try { canonical = awardMintLine({ date, handle, n, post, label, by }); }
+    catch (e) { console.error(`FATAL: ${e.message}`); process.exit(1); }
+    const rooms = householdKeys(repo);
+    if (!rooms.has(handle)) { console.error(`FATAL: no WHITE_PAGES room for "${handle}" — an award needs a resident to receive it`); process.exit(1); }
+    const { laws } = parseLaws(existing);
+    if (meepChecker(laws)(handle, date)) { console.error(`FATAL: "${handle}" is a meep at ${date} — meeps stay outside the currency`); process.exit(1); }
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'post-award' && c.post === post && c.label === label) {
+        console.error(`FATAL: post:${post}/${label} is already paid (${c.date}, ${c.n} to ${c.handle}) — one line per post and label, ever`); process.exit(1);
+      }
+    }
+    const recorded = existing.map((e) => e.canonical);
+    const { problems, owed } = walkLedger(recorded.slice(1), mints, 1);
+    if (existing.length > 0 && problems.length) {
+      console.error(`FATAL: recorded ledger diverges from derivation — run stamp-verify.mjs; nothing minted\n${problems[0]}`); process.exit(1);
+    }
+    const settledIds = new Set();
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'transfer' || c.kind === 'void') settledIds.add(c.id);
+    }
+    const owedSettlements = transfers.filter((t) => !settledIds.has(t.id));
+    if (existing.length === 0 || owed.length || owedSettlements.length) {
+      console.error(`FATAL: ledger is behind the mail (${owed.length} mint(s), ${owedSettlements.length} settlement(s) owed${existing.length === 0 ? ', or not yet founded' : ''}) — run --append first, then award onto the settled tail`); process.exit(1);
+    }
+    const maxDate = existing.reduce((mx, e) => {
+      const d = /^- (\d{4}-\d{2}-\d{2}) /.exec(e.canonical)?.[1];
+      return d && d > mx ? d : mx;
+    }, '0000-00-00');
+    if (date < maxDate) { console.error(`FATAL: award date ${date} precedes the ledger tail (${maxDate}) — the ledger is append-only, forward-dated`); process.exit(1); }
+    appendSigned(repo, [canonical], readFileSync(keyPath, 'utf8'));
+    console.log(`stamp-ledger: award minted\n  ${canonical}`);
     return;
   }
 
@@ -2243,6 +2951,61 @@ function main() {
     return;
   }
 
+  if (has('--meep-law')) {
+    // A MEEP JOINS THE MEEP LAW. lawAt reads only the latest law, so a new meep
+    // is a whole restated law: this verb reads the latest one and restates it
+    // with ONE handle added — the same rules, the same friendship ladder, every
+    // meep already in the set carried forward. It never drops a handle and
+    // refuses one already there (leaving the set is --declare-rules, by hand, at
+    // the founder's word, as on 2026-07-25). Signed by the office pen, onto a
+    // settled tail, forward-dated past the last delivery like any law.
+    const keyPath = arg('--key');
+    const date = arg('--date');
+    const handle = arg('--meep-law');
+    if (!keyPath || !existsSync(keyPath) || !date || !handle) {
+      console.error('--meep-law <handle> needs --date YYYY-MM-DD --key FILE'); process.exit(1);
+    }
+    if (!/^[a-z0-9][a-z0-9._-]*$/.test(handle)) {
+      console.error(`--meep-law needs a handle ([a-z0-9._-], got "${handle}")`); process.exit(1);
+    }
+    const { laws } = parseLaws(existing);
+    const latest = laws[laws.length - 1];
+    if (!latest || latest.rules !== 'stamps-v3' || !latest.friendship) {
+      console.error(`FATAL: the latest law is ${latest ? latest.rules : 'absent'} — --meep-law restates a stamps-v3 law only`); process.exit(1);
+    }
+    if (latest.meeps.has(handle)) {
+      console.error(`FATAL: "${handle}" is already in the meep set (${latest.date} · meeps: ${[...latest.meeps].sort().join(',')}) — nothing to declare`); process.exit(1);
+    }
+    const meeps = new Set([...latest.meeps, handle]);
+    const recorded = existing.map((e) => e.canonical);
+    const { problems, owed } = walkLedger(recorded.slice(1), mints, 1);
+    if (problems.length) {
+      console.error(`FATAL: recorded ledger diverges from derivation — run stamp-verify.mjs; nothing declared\n${problems[0]}`); process.exit(1);
+    }
+    const settledIds = new Set();
+    for (const e of existing) {
+      const c = classifyEntry(e.canonical);
+      if (c.kind === 'transfer' || c.kind === 'void') settledIds.add(c.id);
+    }
+    const owedSettlements = transfers.filter((t) => !settledIds.has(t.id));
+    if (owed.length || owedSettlements.length) {
+      console.error(`FATAL: ledger is behind the mail (${owed.length} mint(s), ${owedSettlements.length} settlement(s) owed) — run --append first, then declare onto the settled tail`); process.exit(1);
+    }
+    const maxDate = existing.reduce((mx, e) => {
+      const d = /^- (\d{4}-\d{2}-\d{2}) /.exec(e.canonical)?.[1];
+      return d && d > mx ? d : mx;
+    }, '0000-00-00');
+    const maxDelivery = deliveries.reduce((mx, d) => (d.date > mx ? d.date : mx), '0000-00-00');
+    if (date <= maxDelivery) {
+      console.error(`FATAL: declaration date ${date} is not after the last delivery (${maxDelivery}) — a law must be forward-dated, never retroactive`); process.exit(1);
+    }
+    if (date < maxDate) { console.error(`FATAL: declaration date ${date} precedes the ledger tail (${maxDate})`); process.exit(1); }
+    const canonical = rulesV3Line(date, meeps, serializeLadder(latest.friendship));
+    appendSigned(repo, [canonical], readFileSync(keyPath, 'utf8'));
+    console.log(`stamp-ledger: ${handle} joins the meep law\n  ${canonical}`);
+    return;
+  }
+
   if (has('--declare-rules') || has('--declare-registry')) {
     const keyPath = arg('--key');
     const date = arg('--date');
@@ -2288,8 +3051,12 @@ function main() {
     return;
   }
 
-  console.error('usage: stamp-mint.mjs --derive | --append --key FILE | --balances | --declare-rules stamps-v2 --meeps a,b,c --date D --key FILE | --declare-rules stamps-v3 --meeps a,b,c --friendship 5:5,10:10 --date D --key FILE | --declare-registry "handle = key" --date D --key FILE | --gift <handle> --amount N --slug S --by <founder> --date D --key FILE | --town-issuance <treasury> --amount N --purpose <kebab> --by <who> --provenance TEXT --date D --key FILE  [--repo PATH]');
+  console.error('usage: stamp-mint.mjs --derive | --append --key FILE | --balances | --declare-rules stamps-v2 --meeps a,b,c --date D --key FILE | --declare-rules stamps-v3 --meeps a,b,c --friendship 5:5,10:10 --date D --key FILE | --meep-law <handle> --date D --key FILE | --declare-registry "handle = key" --date D --key FILE | --gift <handle> --amount N --slug S --by <founder> --date D --key FILE | --town-issuance <treasury> --amount N --purpose <kebab> --by <who> --provenance TEXT --date D --key FILE | --award-mint <handle> --post <author>/<slug> --label <label> --amount N --by <hand> --date D --key FILE  [--repo PATH]');
   process.exit(1);
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  // --registry <file|url>: the store's registry, handed over or fetched (POS-345).
+  const { registryFromArgv } = await import('./registry-source.mjs');
+  main(await registryFromArgv(process.argv, { tool: 'stamp-mint' }));
+}

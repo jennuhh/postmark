@@ -34,11 +34,47 @@ import {
   settlementDecision, meepChecker, rulesLine,
   parseStampLedger, sealChain, foldBalances, parseLaws, classifyEntry, walkLedger,
   townIssuanceDial,
-  keepingDial, potFile, deriveEpochClose, keepingLine, TREASURY_POT,
+  keepingDial, potFile, deriveEpochClose, keepingLine, TREASURY_POT, STAGE_LADDER,
+  AWARD_MAX, AWARD_HANDS, QUEST_PAY, RECREDIT_STAGES, CORRECTION_HANDS,
 } from './stamp-mint.mjs';
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
 const DEFAULT_REPO = resolve(SCRIPT_DIR, '..');
+
+// WELCOME LINES RULED LAWFUL BY THE FOUNDER, one by one, keyed by the line's
+// own signature (only the office pen could have written it, and it binds the
+// line to its place in the chain, so no other line can borrow the ruling).
+// Each entry skips the welcome's key and once-per-household checks for that
+// line alone; its stamps still fold like any mint.
+//
+//   wildcat, 2026-09-28 · welcome:login:commander-and-chief. The house of many
+//   doors (gh:334016343) was welcomed through kinofire on 09-25. Wildcat joined
+//   by PR, the office did not yet know the login was that house's, and the
+//   12:00Z crossing minted a second bundle; the binding that made them one
+//   house landed at 13:59Z (town d9ff628). A double welcome by the town's
+//   error, not the resident's. Keemin, 2026-09-28: "agreed with your instance
+//   fix" — wildcat keeps the five. The class (judge a welcome by the account,
+//   before it is minted) is the settle-join fix's to close.
+//
+//   scout, 2026-09-28 · welcome:login:generalroam-boop. House of Harvey
+//   (gh:273009068) was welcomed through amia-semper on 09-14. Scout joined by
+//   the pen's PR (#3244, merged 02:08Z 09-29), unbound, and the tick paid a
+//   second bundle at 02:22Z under the card's GitHub username. The same account,
+//   the town's error. Keemin, 2026-09-29: the stamps that already went out stay
+//   out (append only). Allowlisted BEFORE Scout's bind, so the bind cannot turn
+//   the verifier red the way Wildcat's did. The class is closed by town
+//   51d0ceb07 (the bundle pays only a bound resident, and compares by house) and
+//   POS-297 (admission is the bind).
+const RULED_WELCOMES = new Set([
+  'XAGgD4zviHwmHM2OXlC0WR6U3C1D0jNCz6D7Z2qxFGB0bQ9sxrq13Xwu0Nwx3CziKrMUg9gd84awPZ5kBn8iDA',
+  'puN9nTwldpee7EBXGdcRQYs-YPsOvfWBZsvA0hckjCyyDCs_9AVXN6mryNLrb2Pd7cM1HfxPaN5iaIlL87fQBw',
+  // postmark-pen, 2026-09-25 · welcome:login:postmark-pen. The office's pen was
+  // made a resident of the-town by a founder's direct commit (55df1afc6), never
+  // pinned, and paid a bundle under its card's GitHub username. Pinned at
+  // 301406700 on 09-29 (c1887e000), which re-keyed the line and redded it.
+  // The same ruling as Scout's: the stamps that went out stay out.
+  'PTXsVjCUYqMnmaKrIAZwjqBrq8If07GchFlgAnHQ2NdeOeIYbJcaa4P3fACdEAYbmFR4H6T4KA9oiCVO76jTDg',
+]);
 
 function ballotFile(repo, topic) {
   const p = join(repo, 'WHITE_PAGES', `ballot-${topic}.json`);
@@ -46,7 +82,10 @@ function ballotFile(repo, topic) {
   try { return JSON.parse(readFileSync(p, 'utf8')); } catch { return null; }
 }
 
-export function verifyStampLedger(repo, { pubkeyPem } = {}) {
+// `registry` (POS-345): the store's registry as tools/households.json's
+// object, handed over by --registry <file|url> (tools/registry-source.mjs).
+// Without it, the printout is read, as before.
+export function verifyStampLedger(repo, { pubkeyPem, registry = null } = {}) {
   const problems = [];
   // Checks the verifier could not run. A skipped check must be VISIBLE — silence
   // would read as a pass.
@@ -126,6 +165,15 @@ export function verifyStampLedger(repo, { pubkeyPem } = {}) {
     const oneShotSeen = new Set();      // one-shot issuance purposes already spent
     const firstIdeaHouses = new Set();  // household keys already paid their first-idea mint
     const welcomedHouses = new Set();   // household keys already paid their welcome bundle
+    const paidStages = new Set();       // `${post}/${stage}` already paid its stage stamps
+    const paidAwards = new Set();       // `${post}/${label}` already paid its award (POS-290)
+    const paidQuests = new Set();       // `${quest}|${household}` already paid (POS-632)
+    const stageLineOf = new Map();      // `${post}/${stage}` -> the stage line { handle, n, sig } (POS-649)
+    const stageLineBySig = new Map();   // a stage line's sig -> { post, stage, handle, n } (POS-649)
+    const recredited = new Set();       // `${post}/${stage}` already re-credited (once, ever)
+    const burnedSigs = new Set();       // stage-line sigs already burned by a correction (once, ever)
+    const postPosition = new Map();     // `${post}|${handle}` -> { n, side }, the open stake on a post
+    const postReturned = new Set();     // `${post}|${handle}` already returned (once, ever)
     // ONE HOUSE, TWO SPELLINGS (2026-09-20, cloud-phi). A household declared
     // through the office door is keyed `hh:<slug>` by the drain's registry line,
     // while the pin the welcome plan read the same afternoon keyed it
@@ -139,9 +187,14 @@ export function verifyStampLedger(repo, { pubkeyPem } = {}) {
     const houseSlugByGhId = (() => {
       const m = new Map();
       try {
-        const hhFile = JSON.parse(readFileSync(join(repo, 'tools', 'households.json'), 'utf8'));
-        for (const [slug, rec] of Object.entries(hhFile?.households ?? {}))
+        const hhFile = registry ?? JSON.parse(readFileSync(join(repo, 'tools', 'households.json'), 'utf8'));
+        for (const [slug, rec] of Object.entries(hhFile?.households ?? {})) {
           for (const a of rec?.accounts ?? []) if (a && a.id != null) m.set(`gh:${a.id}`, `hh:${slug}`);
+          // A key the house once carried (`formerly`, printed from the store) is
+          // the same house: POS-299 re-keyed Emmett's after its welcome, and the
+          // line's date still resolves the recipient to the old key.
+          for (const f of rec?.formerly ?? []) if (f) m.set(`hh:${f}`, `hh:${slug}`);
+        }
       } catch { /* no declared households: every key is its own spelling */ }
       return m;
     })();
@@ -376,7 +429,7 @@ export function verifyStampLedger(repo, { pubkeyPem } = {}) {
         firstIdeaHouses.add(houseKey);
       }
 
-      if (cls.kind === 'welcome') {
+      if (cls.kind === 'welcome' && !RULED_WELCOMES.has(entries[i].sig)) {
         // The welcome bundle (founder-ruled 2026-09-14). The signature proves
         // the office pen; the fold holds the quest's own terms, quoted from the
         // rule's grammar comment: "amount exactly 5, authority the-town, the
@@ -407,6 +460,202 @@ export function verifyStampLedger(repo, { pubkeyPem } = {}) {
           problems.push(`line ${lineNo}: LAWFUL fails — household of "${cls.handle}" already holds its welcome bundle (once per household, ever)`); break;
         }
         welcomedHouses.add(houseKey);
+      }
+
+      if (cls.kind === 'post-stage') {
+        // A bug's stage stamps (Posts phase 2, 2026-09-29). The signature proves
+        // the office pen; the stage having happened is the pen's assertion, as a
+        // join bundle's arrival is, because this repo cannot see the store. The
+        // fold holds the rest, quoted from the grammar comment: "the amount is on
+        // the ladder for its stage, by: is the-town, the meep law, and ONE line
+        // per post and stage, ever."
+        //
+        // An award whose label is a stage's name reads as THIS kind, never as an
+        // award (the two grammars are disjoint on purpose). A hand's `by:` is how
+        // it shows, so it is named for what it is before the ladder speaks.
+        if (AWARD_HANDS.includes(cls.by)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${cls.post}/${cls.stage} is an award by ${cls.by} under a bug stage's name (an award label is never a stage; stages are the town's mint)`); break;
+        }
+        if (!(STAGE_LADDER[cls.stage] ?? []).includes(cls.n)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — ${cls.stage} pays ${(STAGE_LADDER[cls.stage] ?? []).join(' or ')}, not ${cls.n} (post:${cls.post}/${cls.stage})`); break;
+        }
+        if (cls.by !== 'the-town') {
+          problems.push(`line ${lineNo}: LAWFUL fails — stage stamps are the town's mint (by: "${cls.by}", must be the-town)`); break;
+        }
+        if (lawAt(cls.date).meeps.has(cls.handle)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — stage stamps to meep "${cls.handle}" (meeps stay outside the currency)`); break;
+        }
+        const k = `${cls.post}/${cls.stage}`;
+        if (paidStages.has(k)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${k} is paid twice (one line per post and stage, ever)`); break;
+        }
+        paidStages.add(k);
+        stageLineOf.set(k, { handle: cls.handle, n: cls.n, sig: entries[i].sig });
+        stageLineBySig.set(entries[i].sig, { post: cls.post, stage: cls.stage, handle: cls.handle, n: cls.n });
+      }
+
+      // ── the correction (POS-649, Darko 2026-10-15) ───────────────────────
+      // A stage paid to the wrong resident: its recredit pays the right one the
+      // SAME amount, and the very next line burns the wrong mint, named by its
+      // full signature, from the handle it paid. Either half alone, either half
+      // twice, or a burn of anything but a stage line is red. The overdraw of
+      // the wrong recipient's liquid stamps is the running fold's below (a burn
+      // is an arrow out of the handle, so it can never draw on escrow).
+      if (cls.kind === 'post-recredit') {
+        const k = `${cls.post}/${cls.stage}`;
+        const wrong = stageLineOf.get(k);
+        if (cls.by !== 'the-town') {
+          problems.push(`line ${lineNo}: LAWFUL fails — a recredit is the town's mint (by: "${cls.by}", must be the-town) (post:${k}-recredit)`); break;
+        }
+        if (!RECREDIT_STAGES.includes(cls.stage)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — only ${RECREDIT_STAGES.join(', ')} are re-credited (post:${k}-recredit)`); break;
+        }
+        if (!wrong) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${k}-recredit corrects a stage that was never paid`); break;
+        }
+        if (cls.n !== wrong.n) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${k}-recredit pays ${cls.n}, and the stage it corrects paid ${wrong.n} (the same amount, never another)`); break;
+        }
+        if (cls.handle === wrong.handle) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${k}-recredit pays ${cls.handle}, who the stage already paid`); break;
+        }
+        if (lawAt(cls.date).meeps.has(cls.handle)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — a recredit to meep "${cls.handle}" (meeps stay outside the currency)`); break;
+        }
+        if (recredited.has(k)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${k} is re-credited twice (one correction per post and stage, ever)`); break;
+        }
+        const next = entries[i + 1] ? classifyEntry(entries[i + 1].canonical) : { kind: 'none' };
+        if (next.kind !== 'correction-burn' || next.sig !== wrong.sig) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${k}-recredit is not followed by the burn of the mint it corrects (${wrong.sig.slice(0, 16)}…); the two are written together or not at all`); break;
+        }
+        recredited.add(k);
+      }
+      if (cls.kind === 'correction-burn') {
+        const wrong = stageLineBySig.get(cls.sig);
+        if (!wrong) {
+          problems.push(`line ${lineNo}: LAWFUL fails — correction:${cls.sig.slice(0, 16)}… names no earlier stage line (a correction burns a bug stage's mint, nothing else)`); break;
+        }
+        const k = `${wrong.post}/${wrong.stage}`;
+        if (cls.handle !== wrong.handle) {
+          problems.push(`line ${lineNo}: LAWFUL fails — the correction of post:${k} burns from ${cls.handle}, and that mint paid ${wrong.handle}`); break;
+        }
+        if (cls.n !== wrong.n) {
+          problems.push(`line ${lineNo}: LAWFUL fails — the correction of post:${k} burns ${cls.n}, and that mint was ${wrong.n} (exactly its amount)`); break;
+        }
+        if (!CORRECTION_HANDS.includes(cls.by)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — a correction is a hand's (${CORRECTION_HANDS.join(' or ')}), not "${cls.by}" (post:${k})`); break;
+        }
+        if (burnedSigs.has(cls.sig)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — the mint post:${k} is burned twice (one correction per mint, ever)`); break;
+        }
+        // A MEEP'S STAGE MINT IS BURNED ALONE (POS-655, Darko 2026-10-16 20:04
+        // EDT): "meeps are credited, not paid". A stage line that paid a handle
+        // the law in force at the burn's date names a meep has no right
+        // recipient to re-credit, so its correction is the burn alone. Every
+        // other correction still follows its recredit, line for line.
+        const prev = i > 0 ? classifyEntry(entries[i - 1].canonical) : { kind: 'none' };
+        const meepCorrection = lawAt(cls.date).meeps.has(wrong.handle);
+        if (!meepCorrection && (prev.kind !== 'post-recredit' || `${prev.post}/${prev.stage}` !== k)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — the correction of post:${k} does not follow its recredit; the two are written together or not at all (only a meep's stage mint is burned alone)`); break;
+        }
+        burnedSigs.add(cls.sig);
+      }
+
+      // ── a quest the town pays (POS-632) ─────────────────────────────────
+      // The signature proves the office pen; the fold holds the terms, from the
+      // sealed QUEST_PAY table, quoted from the grammar comment: "the quest is in
+      // QUEST_PAY; the amount is exactly its amount; the line's date is inside its
+      // window; by: is the-town; the meep law; the named key IS the recipient's
+      // household at the line's date; and ONE line per quest and household, ever."
+      if (cls.kind === 'quest-pay') {
+        const terms = QUEST_PAY[cls.quest];
+        if (!terms) {
+          problems.push(`line ${lineNo}: LAWFUL fails — quest:${cls.quest} is not a paid quest (${Object.keys(QUEST_PAY).join(', ')})`); break;
+        }
+        if (cls.n !== terms.amount) {
+          problems.push(`line ${lineNo}: LAWFUL fails — quest:${cls.quest} pays exactly ${terms.amount} (got ${cls.n})`); break;
+        }
+        if (cls.date < terms.from || (terms.until && cls.date > terms.until)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — quest:${cls.quest} pays from ${terms.from}${terms.until ? ` until ${terms.until}` : ''}, not on ${cls.date}`); break;
+        }
+        if (cls.by !== 'the-town') {
+          problems.push(`line ${lineNo}: LAWFUL fails — a quest is the town's mint (by: "${cls.by}", must be the-town)`); break;
+        }
+        if (lawAt(cls.date).meeps.has(cls.handle)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — quest pay to meep "${cls.handle}" (meeps stay outside the currency)`); break;
+        }
+        const houseKey = hh(cls.handle, cls.date);
+        if (canonHouse(cls.household) !== canonHouse(houseKey)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — quest:${cls.quest} names household "${cls.household}" but "${cls.handle}" is ${houseKey} at ${cls.date}`); break;
+        }
+        const k = `${cls.quest}|${canonHouse(houseKey)}`;
+        if (paidQuests.has(k)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — quest:${cls.quest} is paid twice to household ${houseKey} (one line per quest and household, ever)`); break;
+        }
+        paidQuests.add(k);
+      }
+
+      // ── the idea posts (POS-290) ─────────────────────────────────────────
+      // The award: the signature proves the office pen; the fold holds the
+      // terms, quoted from the grammar comment: "n is 1..AWARD_MAX, `by:` is one
+      // of AWARD_HANDS, the meep law on the recipient, and ONE line per post and
+      // label, ever."
+      if (cls.kind === 'post-award') {
+        if (!AWARD_HANDS.includes(cls.by)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — an award is paid by a hand (${AWARD_HANDS.join(' or ')}), not by "${cls.by}" (post:${cls.post}/${cls.label})`); break;
+        }
+        if (cls.n > AWARD_MAX) {
+          problems.push(`line ${lineNo}: LAWFUL fails — an award pays at most ${AWARD_MAX}, not ${cls.n} (post:${cls.post}/${cls.label})`); break;
+        }
+        if (lawAt(cls.date).meeps.has(cls.handle)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — award to meep "${cls.handle}" (meeps stay outside the currency)`); break;
+        }
+        const k = `${cls.post}/${cls.label}`;
+        if (paidAwards.has(k)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post:${k} is awarded twice (one line per post and label, ever)`); break;
+        }
+        paidAwards.add(k);
+      }
+
+      // The stake with a side. Overdraw is structural (the movement fold below):
+      // a stake past the staker's balance overdraws the handle, and a way out
+      // past the post's whole escrow overdraws `stake:post/<id>`. What that fold
+      // cannot see is the POSITION: the account is per post while a position is
+      // per (post, handle), so these branches hold ownership (the world-unstake
+      // hole), the one side, the whole return, and its once.
+      if (cls.kind === 'post-stake') {
+        if (lawAt(cls.date).meeps.has(cls.handle)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — meep "${cls.handle}" cannot stake`); break;
+        }
+        const pk = `${cls.post}|${cls.handle}`;
+        const open = postPosition.get(pk) ?? { n: 0, side: null };
+        if (open.n > 0 && open.side !== cls.side) {
+          problems.push(`line ${lineNo}: LAWFUL fails — ${cls.handle} stakes ${cls.side} on post ${cls.post} while holding ${open.n} ${open.side} there (a position has one side)`); break;
+        }
+        postPosition.set(pk, { n: open.n + cls.n, side: cls.side });
+      }
+
+      if (cls.kind === 'post-unstake') {
+        const pk = `${cls.post}|${cls.handle}`;
+        const open = postPosition.get(pk) ?? { n: 0, side: null };
+        if (cls.n > open.n) {
+          problems.push(`line ${lineNo}: LAWFUL fails — ${cls.handle} unstakes ${cls.n} from post ${cls.post} but holds only ${open.n} there`); break;
+        }
+        postPosition.set(pk, { n: open.n - cls.n, side: open.side });
+      }
+
+      if (cls.kind === 'post-return') {
+        const pk = `${cls.post}|${cls.handle}`;
+        if (postReturned.has(pk)) {
+          problems.push(`line ${lineNo}: LAWFUL fails — post ${cls.post} already returned ${cls.handle}'s stake (one return per post and resident, ever)`); break;
+        }
+        const open = postPosition.get(pk) ?? { n: 0, side: null };
+        if (cls.n !== open.n) {
+          problems.push(`line ${lineNo}: LAWFUL fails — a post return is whole: ${cls.n} to ${cls.handle} on post ${cls.post}, but the open position is ${open.n}`); break;
+        }
+        postReturned.add(pk);
+        postPosition.set(pk, { n: 0, side: open.side });
       }
 
       if (cls.kind === 'town-issuance') {
@@ -503,10 +752,10 @@ export function verifyStampLedger(repo, { pubkeyPem } = {}) {
   return { ok: problems.length === 0, problems, notes, lines: entries.length, minted: -(bal.get('MINT') ?? 0) };
 }
 
-function main() {
+function main(registrySource = null) {
   const i = process.argv.indexOf('--repo');
   const repo = resolve(i !== -1 ? process.argv[i + 1] : DEFAULT_REPO);
-  const r = verifyStampLedger(repo);
+  const r = verifyStampLedger(repo, { registry: registrySource?.registry ?? null });
   if (r.ok) {
     console.log(`✓ stamp-ledger verifies — ${r.lines} line(s), ${r.minted} minted, chain + signatures + replay + conservation + lawful all green`);
     // A check the verifier could not run is printed on a GREEN result too. Green
@@ -520,4 +769,8 @@ function main() {
   }
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  // --registry <file|url>: the store's registry, handed over or fetched (POS-345).
+  const { registryFromArgv } = await import('./registry-source.mjs');
+  main(await registryFromArgv(process.argv, { tool: 'stamp-verify' }));
+}

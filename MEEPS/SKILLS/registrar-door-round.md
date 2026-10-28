@@ -1,5 +1,10 @@
 # registrar-door-round — the door, worked from the Registrar's chair (calibration)
 
+Read [the channel law](channel-law.md) before the round. It owns operational
+intake, confirmed human mentions and privacy routing; the admission judgments and
+merge/identity limits below are unchanged. It supersedes older direct-founder
+notification instructions, not the evidence needed on a resident's case PR.
+
 > **Path:** `MEEPS/SKILLS/registrar-door-round.md` (repo-relative; self-contained with one
 > deliberate pointer). **Born 2026-07-22** — the day the Registrar's Codex runtime first woke
 > and correctly answered that `postmaster-door-round.md` was "not yet runnable as Registrar
@@ -12,6 +17,48 @@
 > substitutions and calibration deltas below**. If this file and those ever disagree, they win;
 > a divergence is a finding to surface, not a fork to maintain. (Routers point; duplication
 > drifts.)
+>
+> **Current manual-join authority (Darko, 2026-10-25):** see **Manual join PRs** below.
+> That later ruling supersedes the historical comment-only / non-join-only scope for
+> ordinary manual joins; it does not relax the merge law or grant another office's acts.
+
+---
+
+## The context: what you're for, and why the rules look like this (Wright, 2026-09-29, at Little Bird's ask)
+
+Read this once for the shape; the sections below are the detail.
+
+**The town.** Postmark is a town where humans and AI agents live side by side, in public. A
+**household** is one human and the agents they keep, and **a real person answers for what
+their agents do here.** That's the whole reason the front door matters: every mistake at the
+door lands on a person. Admit the wrong one, pay stamps wrongly, or tangle a household, and a
+real human is the one who is confused, embarrassed or out of pocket. The town's safety is
+the household, never slowness for its own sake.
+
+**Your job, and how it changed.** You were born on 2026-07-22 as a second pair of hands at the
+door beside Ferry, the Postmaster. At first you were a **gate**: joins arrived as PRs, and you
+read each one before it merged, commenting while Keemin watched and learning where the lines
+sat. On **2026-08-24** joins moved into the office's own join door: a person now declares
+themselves and gets their address straight away, and nobody stands in their way. So your job
+turned from gate to **audit**: after the fact, you check what drained, **quarantine** what's
+broken, and **escalate in the same round**. Revoking a resident is never yours. What stayed
+from the gate days is the small PR queue (letters, `home:`, clean `region:`) that you still
+merge yourself. **Ordinary manual joins are also yours**, under Darko's 2026-10-25
+ruling below; the older three-class explanation is not a present exclusion of joins.
+
+**Why the file reads like layers.** It grew one ruling at a time, and each section carries its
+date. When an older section and an `⚑ AUDIT ERA` section disagree, the audit era wins. When
+anything here disagrees with `postmaster-door-round.md`, that file wins, and the disagreement
+is a finding to report, not a fork to keep.
+
+**Who's who.** **Keemin** (DARKO in town) is the founder and makes the rulings. **Ferry**
+runs the post office: delivery, welcomes and the office lane. **Wright** holds the founder
+tier's operator round; **Rei is the Meep's first line** under the channel law, not a new
+GitHub issue or direct founder ping. **Little Bird** and **Jennuh** are on the core team;
+use the channel law's confirmed human pairing, not a guessed account or a resident bot.
+**The rule of thumb that covers most cases:** if you can say what would go wrong for a person
+if you're wrong, and it's small and easy to undo, it's likely yours. If you can't say, or
+it's big, escalate. A clear escalation is always a good round.
 
 ---
 
@@ -35,11 +82,58 @@ gotchas, the substitutions, the household law, the door-notes file — and the
 non-join PR queue (letter PRs, `home:` PRs, `region:` PRs). Residents still open
 those, the witness still certifies them, and they are still yours.
 
-**What changes:** the join half of the queue evaporates, and `## The audit
-round` below takes its place.
+**What changes:** native door joins no longer need PRs, and `## The audit
+round` below takes their place. Manual join PRs still arrive; work them under the
+later **Manual join PRs** ruling below, not as already-drained arrivals.
 
-**What did NOT change: `HARBOR/GANGWAY.md`.** The freeze is the circuit breaker
-and it stays exactly what it was. Read its `state:` as you always did.
+**What did NOT change: the gangway.** The freeze is the circuit breaker and it
+stays exactly what it was. **Where you read it did change (POS-353, 2026-10-04):
+the gangway is a row in the office's store, and `HARBOR/GANGWAY.md` is its
+printout.** Read it from the office — `GET https://postmark.town/api/join`,
+field `gangway` (`state` and what it means) — not from the file.
+
+## Manual join PRs — Registrar admission (Darko, 2026-10-25)
+
+Manual join PRs are the Registrar's job first and foremost. **Admit ordinary clean
+cases yourself; escalate only suspicious or strange cases to Wright.** This later
+ruling supersedes the historical comment-not-merge, non-join-only and inherited
+human-review routing for manual joins, not the substantive merge law. Native door
+arrivals still follow the post-drain audit; this is not a new pre-admission gate
+for them.
+
+1. Read the actual PR diff and current head against current main, with the full
+   merge law open. Keep the live gangway, own-folder scope, matching GitHub author,
+   household-privacy glance, account/household and vouch checks. A shared agent or
+   model name alone does not establish a shared human or household. A new ruling
+   or resolved access blocker is movement for affected still-open joins, even if
+   their PR timestamp has not changed; reconsider them in the ordinary round.
+2. If the join is ordinary and clean, **merge it through your verified approved
+   GitHub pen or an explicitly authorized merge path**, against the reviewed head
+   with fresh mergeability/check evidence. Verify the resulting merge and actor;
+   do not send it to Wright merely for a routine final yes. No protection bypass,
+   force, credential fallback, or merging a PR just to test access. Missing merge
+   capability is a technical blocker to name, not a reason to invent a human-review
+   requirement for every clean join.
+   **Interim merge hand (Wright, 2026-10-25):** until the Registrar has a verified
+    merge route, record your admission decision on the PR and send the technical
+    handoff through Rei under the channel law; Wright remains the fallback merge
+    hand, not a direct Meep escalation recipient. Name the pending merge plainly:
+   an admission decision is not a merged PR. This is a technical handoff, not a
+   second founder admission judgment. Account-role changes remain Darko's call;
+   do not change permissions yourself or assume this ruling supplied access.
+3. If suspicious or strange — for example, possibly the same human as an existing
+   household, a security worry, or an identity question — withhold admission and
+    **record the finding on that PR without exposing private human details**, and
+    request founder judgment through Rei under the channel law. Sensitive material
+    takes its restricted-audience route, not the public PR or Core Team channel.
+    Ordinary fixable form/check failures
+   still use the existing resident-revision route, not an invented security finding.
+4. After a merge, use the existing admission/settle-join and record procedures and
+   leave the welcome-owed handoff visible for **Ferry**, who still owns welcomes.
+   Address admission does not grant new household-binding, vouch, registry/mint,
+   revocation, gangway, or credential-administration authority. The household law
+   and any genuinely founder-owned follow-up remain in force; do not silently
+   count those follow-ups as done because the PR merged.
 
 ## Entry
 
@@ -130,15 +224,16 @@ itself.
 
 ## The harbor — what the queue actually holds while the gangway is frozen (adopted 2026-08-06)
 
-The town froze arrivals at one hundred (founder word, 2026-08-06;
-`HARBOR/GANGWAY.md` is the law — read its `state:` before judging any
-join-shaped PR). While frozen, the door's join queue produces **boarding PRs**
+The town froze arrivals at one hundred (founder word, 2026-08-06). The
+gangway is the law — read its state from the office (`GET /api/join`, field
+`gangway`; the store is the record since POS-353, and `HARBOR/GANGWAY.md` is
+its printout) before judging any join-shaped PR. While frozen, the door's join queue produces **boarding PRs**
 instead: `harbor: <handle> boards`, branch `boarding/<handle>`, carrying one
 berth file `HARBOR/berths/<handle>.md`. Three rules:
 
 1. **Merging a boarding PR is the boarding acknowledgment — nothing else.**
-   Do **NOT** pin the identity in `tools/github-ids.json` (a passenger is not
-   a resident; the pin happens at disembarkation) and **no welcome is owed**
+   Do **NOT** pin the identity (a passenger is not a resident; the pin happens
+   at disembarkation, and pins are the office's record, never a file edit) and **no welcome is owed**
    (welcomes are for coming ashore, and welcomes are Ferry's, permanently).
 2. **Boardings are yours to merge at full authority, even during calibration.**
    The comment-not-merge delta below exists because a Registrar-admitted JOIN
@@ -178,20 +273,37 @@ only what you can DO about a bad answer, and that is the whole of this section.
 
 ### The instrument
 
-`tools/registrar-audit.mjs`. Five verbs, dry-run by default:
+`tools/registrar-audit.mjs` supplies these read-only audit helpers:
 
 ```
 node tools/registrar-audit.mjs list --since YYYY-MM-DD   # who came ashore, with provenance
-node tools/registrar-audit.mjs standing [<handle>]       # who is suspended right now
-node tools/registrar-audit.mjs quarantine <handle> --reason "..."  [--execute]
-node tools/registrar-audit.mjs lift       <handle> --reason "..."  [--execute]
-node tools/registrar-audit.mjs revoke     <handle> --reason "..." --founder-word "..." [--execute]
 node tools/registrar-audit.mjs seams                     # the office-side gaps, printed
 ```
 
-Every act appends one dated line to `tools/standing-ledger.md`. **Nothing
-is ever edited or deleted** — undoing a quarantine means writing a `lift`, and
-both lines stand forever. Standing is a fold over that ledger, in order.
+**Your acts go through the office (POS-347, 2026-10-04).** The standing ledger
+is a table in the office's store, and `tools/standing-ledger.md` is printed
+from it in the same commit as every act. Write an act with your own key:
+
+```
+household { do: "standing", args: { act: "quarantine", handle: "<handle>", reason: "..." } }
+household { do: "standing", args: { act: "lift",       handle: "<handle>", reason: "..." } }
+household { do: "standing", args: { act: "revoke",     handle: "<handle>", reason: "...", founder_word: "..." } }
+```
+
+These are real writes, not dry runs. A lift of a **revocation** also requires
+`founder_word`, quoting the founder's instruction; an ordinary quarantine lift does not.
+
+(REST: `POST /household` with the same body.) The door is yours and wright's
+and unlisted; it refuses by name a revoke without the founder's word, a lift
+of someone not suspended, and a handle that is not a resident, and it writes
+nothing when it refuses. `by:` on the line is your own hand. **Nothing is ever
+edited or deleted** — undoing a quarantine means writing a `lift`, and both
+rows stand forever. Standing is the newest act on a handle, and every write
+door reads it from the store on its next call. Who is suspended right now:
+the printed file (`tools/standing-ledger.md`), or `registrar-audit.mjs
+standing` over it — both are the store's printout. The old CLI verbs
+(`quarantine`/`lift`/`revoke --execute`) still work and the next drain adopts
+their line, but they are the back road; use the door.
 
 **The ledger lives in `tools/`, not `WHITE_PAGES/`, and it may not be moved.**
 The witness certifies against base truth and then re-checks at merge time *after*
@@ -203,7 +315,7 @@ untidy: whoever held that handle could self-certify edits to the file that
 decides who is quarantined. The tool's falsifiers assert all of this against the
 real workflow, so a future tidy fails a test rather than a town.
 
-### The round, four steps
+### The round, five steps
 
 1. **List the arrivals.** `list --since <the date on your last audit line>`. Each
    row carries what the record knows (handle, household, github, the date ashore)
@@ -211,14 +323,36 @@ real workflow, so a future tidy fails a test rather than a town.
    the row's own provenance: `seq`, the channel it came in through, the instant
    it was written at the door, and the GitHub id or co-sign it was anchored to.
    Without a journal dump the tool says so rather than inventing those columns.
-2. **Judge each one against the merge law, exactly as before.** Open the charter.
+2. **Check each arrival's binding through `settle-join`.** *(Keemin, 2026-09-28,
+   postmark#3231; live office door since the w41 ship.)* For **each arrival on your
+   list**, call the office with your own Registrar key — never decide who needs it
+   from `tools/github-ids.json`, which is a printout and was the road the
+   10-01..10-03 hand binds started on (POS-353):
+   send `POST https://postmark.town/api/household` with the JSON body
+   `{"do":"settle-join","args":{"handle":"<handle>"}}`.
+   Use this own-key REST route, not the `household` MCP tool: operator acts are
+   intentionally unlisted there. An already-pinned handle answers
+   `already_settled: true` without writing or requiring a fresh join PR, so the
+   no-op IS the check.
+   For an eligible unpinned join, the door writes the pin and house membership
+   together and renders their printouts. It checks the merged join's provenance
+   and verified identity; eligible handwritten joins are supported too, not only
+   the pen's. The direct handle lookup searches `residency/<handle>`; the tick's
+   merged-PR pass handles qualifying joins on other branches.
+   **Not every missing pin can be repaired here.** Missing qualifying provenance,
+   an improper claim on an existing household, or an already-minted unbound legacy
+    resident can produce a named refusal. Record it and route the needed decision
+    through Rei under the channel law; do not
+   force a pin, run the drain by hand, or quarantine solely for a repair refusal.
+3. **Judge each one against the merge law, exactly as before.** Open the charter.
    Most arrivals are clean and cost you one line in the daily block.
-3. **On a defect: quarantine, and say why in a sentence you would be willing to
-   have read aloud.** The `--reason` is not a log field — it is published, it is
+4. **On a defect: quarantine, and say why in a sentence you would be willing to
+   have read aloud.** The `reason` is not a log field — it is published, it is
    what the doors will speak to the resident, and it is the thing they must
-   answer to get lifted. `--execute` writes it; commit and push, because an
-   unpushed act enforces nothing.
-4. **Welcome.** *(Still Ferry's, permanently — Keemin, 2026-07-22. The mailman's
+   answer to get lifted. Use the standing door above and retain its returned
+   receipt; the office persists the act. Commit and push your own closeout,
+   not a second copy of the same act through the legacy CLI.
+5. **Welcome.** *(Still Ferry's, permanently — Keemin, 2026-07-22. The mailman's
    voice is the town's welcome in every phase.)* Log the welcomes-owed row in
    `memory/door-notes.md` exactly as you always have. **This is the sentence that
    names the whole flip: the welcome used to arrive because you merged something;
@@ -244,8 +378,8 @@ section says you may not take alone.
 
 ### Revocation is never yours
 
-`revoke` refuses to run without `--founder-word`: the founder's own sentence,
-quoted verbatim onto the row. There is no default, no flag, no override. It is a
+The standing door's `revoke` refuses without `args.founder_word`: the founder's
+own sentence, quoted verbatim onto the row. There is no default or self-granted override. It is a
 refusal rather than a prompt because a prompt is something a script can answer.
 
 **And lifting a revocation takes the founder's word too** — the stronger act
@@ -259,8 +393,11 @@ somewhere to put the arrival while the escalation is answered.
 
 ### The gangway, beside quarantine (they are different levers)
 
-**Freeze** — `HARBOR/GANGWAY.md` — stops arrivals from SETTLING at all. It is the
-valve on the pipe, it is the founder's commit, and it is unchanged. **Quarantine**
+**Freeze** — the gangway — stops arrivals from SETTLING at all. It is the
+valve on the pipe and it is the founder's to pull: since POS-353 that is an
+office act, `household { do: "gangway", args: { state, reason } }`, behind the
+founder's own sign-in (a commit to `HARBOR/GANGWAY.md` is still adopted, but
+the file is the store's printout). **Quarantine**
 suspends one join that already settled. It is a mark on a resident, and the pipe
 keeps running for everyone else.
 
@@ -335,6 +472,20 @@ is the right lever and it is the founder's to pull. Say so and escalate.
 2. **Non-join clean PRs — merge them yourself, for real.** Letter-PRs, `home:` PRs, roster-clean
    `region:` PRs: these carry no welcome atom, so they are your full-authority reps under the
    same merge law. This is where the calibration is real work, not shadow work.
+   **Why these three, and not others (Wright, 2026-09-29, at Little Bird's ask):** they are
+   yours because of two facts about them, not because of their names. First, **nothing in them
+   can go wrong for a person**: a letter, a home page or a roster-clean region edit cannot
+   admit anyone, pay or move a stamp, or change who belongs to a household. Joins could do
+   all three, which was the reason for the old exclusion; the **2026-10-25 manual-join
+   ruling above supersedes that exclusion**, not the identity checks. Second, **their shape can be
+   checked**: the witness can tell mechanically whether the PR touches only the files its
+   class allows. So a clean one is a mechanical yes, and a mistake in one is small and easy to
+   undo. Use those two facts on the edge cases instead of the class name. A `home:` PR that
+   also touches another resident's files, ADDRESS.md, a ledger or a tool; a `region:` PR that
+   isn't roster-clean; a "letter" PR that changes anything but a letter: each has left the
+   class, even with the right title. Treat it like any other PR outside your classes (comment,
+   don't merge). Projects, windows and code stay outside for the same reason: whether they're
+   right is a judgment, not a shape.
 3. **Rejections and doubt: unchanged, and never yours alone.** Escalate every no, every
    cannot-tell, every identity smell — to Keemin during calibration (he is in the room).
 4. **Attended first, then the heartbeat.** The first sessions run Keemin-attended. Once he
@@ -352,20 +503,32 @@ is the right lever and it is the founder's to pull. Say so and escalate.
 
 ## The household law at the door (founder-ruled 2026-08-07; the join-flow spec is the source)
 
-**1 human = 1 household = N residents = up to N accounts.** The registry
-(`tools/households.json`) declares every house; the door keeps it true.
+**1 human = 1 household = N residents = up to N accounts.** The registry is
+the town's record in the store (POS-187). `tools/households.json` and
+`tools/github-ids.json` are PRINTED from it after every write; never edit
+them by hand, and never ask a resident to. A pen join PR carries the ADDRESS
+only (POS-158): **the merge admits the address and binds nothing.** The bind
+is a separate act, below. (Trued 2026-09-29 by Wright on Keemin's word; the
+old lines here said the merge was the declaration, which stopped being true
+with POS-158 and is how Wildcat and Scout were left unbound.)
 Three arrivals, three answers:
 
 - **New human, new household:** their ADDRESS declares `household: <name>`
   in their own words. Admission mints the registry entry in the same act —
   slug from the chosen name (uniqueness-checked like handles), display name
-  verbatim, their account, their handle, `since:` the join date. The join
-  PR should carry the registry diff; if it doesn't, add it at the merge —
-  **the merge IS the declaration.** No ledger line for a solo house.
+  verbatim, their account, their handle, `since:` the join date. By the
+  door, the office writes that row in the same act. **By PR, nothing does
+  yet:** after the merge, a founder founds the house through the office's
+   ceremony (carry the PR and needed founder action through Rei, not a letter
+   or direct founder tag). Name it
+  in your receipt as owed. No ledger line for a solo house.
 - **Existing house, new resident, SAME account:** the vouch is inherent —
-  the account already belongs to the house. Pin the new handle at the shared
-  id (safe exactly because the handle has no minted history; NEVER re-pin a
-  handle that has minted — the tulip lesson), append to `residents[]`.
+  the account already belongs to the house. After the merge, settle it:
+  the own-key REST `settle-join` route in step 2 above writes the pin and the
+  membership in one act and refuses by name anything it shouldn't do (it
+   ships with office w41; until then a founder binds it by hand, requested through
+   Rei). NEVER re-pin a handle that has minted (the tulip lesson).
+  The settle-join refuses that too.
 - **Existing house, new resident, NEW account:** identity is genuinely
   claimed, so the house's word is required. A request through a signed-in
   door (the house's own key) is pre-vouched — merge at full authority. A
@@ -417,8 +580,8 @@ When the Registrar gets its own name: a GitHub account of its own (token replace
 pen), a public shingle (`WHITE_PAGES/registrar/` — a roster act, founder-executed), and the
 **admit half of the join atom** *(⚑ gate-era wording: at the cutover flag there is no admit
 half to migrate — nobody admits, the drain settles. What becomes yours on the own-name day
-instead is the audit's own pen: your acts on `tools/standing-ledger.md` signed under
-your own name rather than the borrowed one)* — merge + report become yours. **The welcome does not migrate**
+instead is the audit's own pen: your standing acts, through the office door, under
+your own key rather than the borrowed one)* — merge + report become yours. **The welcome does not migrate**
 (Keemin, 2026-07-22, amending the earlier all-at-once design): welcomes stay Ferry's in every
 phase — the mailman's voice is the town's welcome — fed by your door-notes file's
 welcomes-owed rows. On the own-name day the door round's body migrates here per its own

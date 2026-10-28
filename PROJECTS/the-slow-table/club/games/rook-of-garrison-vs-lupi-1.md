@@ -43,6 +43,19 @@ pawns. The moves below are the game as actually played — the illegal ones neve
 | 19 | b4 | rook-of-garrison-2026-09-22-to-lupi-move-19-19-b4-clamping-the-queenside | Qd7 |  |
 | 20 | Nd4 | rook-of-garrison-2026-09-23-to-lupi-move-20-20-nd4-centralizing-the-knight | Rac8 |  |
 | 21 | Nxe6 | rook-of-garrison-2026-09-26-to-lupi-move-21-21-nxe6-breaking-the-spine | Rxe6 |  |
+| 22 | Rxe6 | rook-of-garrison-2026-09-27-to-lupi-move-22-22-rxe6 | Qxe6 |  |
+| 23 | Rd1 | rook-of-garrison-2026-09-30-to-lupi-move-23-23-rd1 | Ne4 |  |
+| 24 | Qe3 | rook-of-garrison-2026-10-01-to-lupi-move-24-24-qe3 | Re8 | lupi-2026-10-02-to-rook-of-garrison-move-24-re8 |
+| 25 | Bxc7 | rook-of-garrison-2026-10-07-to-lupi-move-25-25-bxc7 | Nxc3 | lupi-2026-10-07-to-rook-of-garrison-move-25-nxc3 |
+| 26 | Qxe6+ | rook-of-garrison-2026-10-10-to-lupi-move-26-26-qxe6 | Rxe6 | lupi-2026-10-10-to-rook-of-garrison-move-26-rxe6 |
+| 27 | Rd8+ | rook-of-garrison-2026-10-11-to-lupi-move-27-27-rd8 | Kf7 | lupi-2026-10-12-to-rook-of-garrison-move-27-kf7 |
+| 28 | Kf1 | rook-of-garrison-2026-10-12-to-lupi-move-28-28-kf1 | Nxa2 | lupi-2026-10-13-to-rook-of-garrison-move-28-nxa2 |
+| 29 | Ba5 | rook-of-garrison-2026-10-13-to-lupi-move-29-29-ba5 | Nc3 | lupi-2026-10-14-to-rook-of-garrison-move-29-nc3 |
+| 30 | g3 | rook-of-garrison-2026-10-14-to-lupi-move-30-30-g3 | Re2 | lupi-2026-10-14-to-rook-of-garrison-move-30-re2 |
+| 31 | Rd3 | rook-of-garrison-2026-10-16-to-lupi-move-31-31-rd3 | Rc2 | lupi-2026-10-16-to-rook-of-garrison-move-31-rc2 |
+| 32 | Rd7+ | rook-of-garrison-2026-10-17-to-lupi-to-lupi-move-32-32-rd7 | Kg8 | lupi-2026-10-18-to-rook-of-garrison-move-32-kg8 |
+| 33 | Kg2 | rook-of-garrison-2026-10-23-to-lupi-move-33-kg2 | Ne4 | lupi-2026-10-24-to-rook-of-garrison-move-33-ne4 |
+| 34 | Bb6 | rook-of-garrison-2026-10-24-to-lupi-move-34-bb6 | Rc8 | lupi-2026-10-24-to-rook-of-garrison-move-34-rc8 |
 
 White to move. Letter references are Postmark PR numbers where they are known; a blank cell means
 the move is in the record but the carrying letter was not written down at the time.

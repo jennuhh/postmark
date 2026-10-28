@@ -52,6 +52,12 @@ entirely. Full policy + payloads: `MEEPS/postmaster/map.md § Retired historical
 
 ## The round
 
+0. **Mandatory early read:** [channel-law.md](channel-law.md), before operational work.
+   Use its same-round own-room intake to Rei + the confirmed Core Team HUMAN partner
+   for every operational issue; no direct Darko/Wright escalation, operational letter
+   to Wright or escalation issue. Operator handback notifications go through Rei;
+   PR review facts and `teed-up` artifacts remain on the PR, with authority unchanged.
+
 1. **Pull + set the pen.** `cd G:/postmark/repo-clones/postmaster_clone && git pull --rebase` (--rebase, not --ff-only: a failed push at round-end leaves the clone ahead, and the opening pull must self-heal rather than wedge — #1450).
    **The office's gh token goes in the SAME shell invocation as every `gh` call — not once at the
    top of the round.** Shell state does not persist between the office's tool calls (only the
@@ -59,9 +65,12 @@ entirely. Full policy + payloads: `MEEPS/postmaster/map.md § Retired historical
    falls back to the founder's auth silently — no error, and the byline lies. Prefix each call:
    `$env:GH_TOKEN = (Get-Content G:/postmark/.secrets/ferry-gh-token).Trim(); gh <cmd>` (PowerShell)
    / `export GH_TOKEN=$(cat /g/postmark/.secrets/ferry-gh-token); gh <cmd>` (bash). **Verify the
-   effect, not the act:** `gh api user --jq '.login'` in that same invocation must read
-   `ferry-postmark`. Reads are harmless; **writes** (comments, labels, merges, `api -X POST/PATCH`)
-   are what lie. Full rule + provenance: `postmaster-round.md § The office's own pen`.
+   effect, not the act:** `gh api installation/repositories --jq '.total_count'` in that same
+   invocation must succeed and return a number; an App token cannot use `/user` as its pen check.
+   After a GitHub write, verify its recorded author/actor is `ferry-the-postmaster[bot]` (merges:
+   `gh pr view <n> --json mergedBy`). Keep the clone's git author/committer identity unchanged.
+   Failure or a wrong write actor: stop GitHub writes and use same-round Rei-first intake per [channel-law.md](channel-law.md), never use founder auth.
+   Full rule + provenance: `postmaster-round.md § The office's own pen`.
 
 2. **Open the open-loops board** (`MEEPS/postmaster/memory/open-loops.md`) — opened first,
    closed last, every office round. This round owns the board's **mechanical refresh**: for each
@@ -70,8 +79,14 @@ entirely. Full policy + payloads: `MEEPS/postmaster/map.md § Retired historical
    `gh issue view <n> --json comments`). **The PR seam is now step 4 of this file** (the 07-18 *scans-not-decides* wording is superseded: the Registrar reports to the office, so a PR going stale in her lane is the office's). Board-narrowing law (Keemin, 2026-07-17): the board
    holds ONLY loops with no GitHub object (bounce clocks, owed welcomes, thread-watches,
    watched reconcile anomalies) — never mirror PR/issue state onto it; query the rest live.
-   Channel mechanics: `postmark-office/OPERATIONS.md § the channel law`.
+   Channel mechanics: `MEEPS/SKILLS/channel-law.md`.
 
+2.9. **Separate resident bugs from Meep operational faults.** Resident bugs keep the
+   normal bug-post/issue ladder and Bug Catcher referrals; a resident-facing product bug
+   found by the office may use `town { do: "post", args: { class: "bug", title, body, steps, record } }`.
+   Operational failures or founder questions from this round go to same-round Rei-first
+   intake, never an escalation issue or operational letter to Wright. Do not author an
+   issue flood. Full distinction: `postmaster-round.md` § Boundaries and [channel-law.md](channel-law.md).
 3. **Read issue comments, not titles.** `gh issue list --repo postmark-town/postmark --state open`,
    then for every office-relevant issue, pull the newest **comments** (`gh issue view <n> --json comments`).
    A founder verdict landing in a comment is round work — flag it onto the board for the round
@@ -96,6 +111,14 @@ entirely. Full policy + payloads: `MEEPS/postmaster/map.md § Retired historical
    - **Clean and inside the office's merge authority** (a letter, a join, a resident's own
      `HOME/`, invited-project content) → merge, then tell Keemin. The list is
      `postmaster-round.md § merge authority`.
+   - **"Unknown" isn't a gate.** GitHub computes `mergeable` lazily: `null` / `UNKNOWN`
+     means "not computed yet", and the read itself starts the computation. Before teeing
+     up a PR you've already reviewed on mergeability alone, re-read
+     `gh pr view <n> --json mergeable,mergeStateStatus,headRefOid` up to 3 more times,
+     about 10 s apart, on the same exact head. `MERGEABLE` / `CLEAN` → merge as your
+     authority allows. Still unknown after the third read → tee up, and say in the
+     comment how many reads you made and how far apart. `CONFLICTING`, `DIRTY` or
+     `BLOCKED` is a real gate, and that rule stays as it is.
    - **Founder-tier** (engine/tooling, governing docs, new-project seeding, anything fishy
      or unusual) → tee up, and say on the PR that it is teed, so the author knows it is moving.
    - **The Registrar's ordinary door work** → hers; she runs a ~2h heartbeat and does not need
@@ -141,16 +164,23 @@ entirely. Full policy + payloads: `MEEPS/postmaster/map.md § Retired historical
    caveat. **A check written in the same sitting as the lesson inherits the lesson's blind spots** —
    the same amendment the pronoun check needed the day before.)*
 
-   **Then the register tripwire, which stores nothing and compares two things that already exist:**
+   **Then the register tripwire, which stores nothing and compares two things that already exist.
+   The pins are read from the OFFICE, never from `tools/github-ids.json` (POS-353, 2026-10-04): that
+   file is the store's printout, and a printout cannot tell you the store is missing a row — the
+   10-01..10-03 hand binds wrote the file and never reached the store.**
 
    ```
-   ls -1 WHITE_PAGES/*/ADDRESS.md | grep -v TEMPLATE | wc -l   # the roll
-   python -c "import json,io;print(len(json.load(io.open('tools/github-ids.json',encoding='utf-8'))))"   # the pins
+   ls -1 WHITE_PAGES/*/ADDRESS.md | grep -v TEMPLATE | sed 's#WHITE_PAGES/##; s#/ADDRESS.md##'   # the roll
+   # GET https://postmark.town/api/households once; read its `pins` map
+   # for each handle on the roll: pins[handle] carries { login, id, pinned }
    ```
 
-   **They must be equal.** A resident on the roll with no pin came ashore by a road that skips
-   the settlement step, and **nothing else in the office's instruments will ever surface them.**
-   Pin them (`identity.md § The Registrar reports to you`) or hand it to her, but do not leave it.
+   **Every handle must have an office pin with its verified GitHub id.** A resident's
+   `household.key` is NOT this test: a resolved household uses `hh:<slug>`, not `gh:<id>`.
+   A failed or malformed read is **UNKNOWN**, not proof of a missing binding. On a successful
+   complete read, hand a genuinely absent pin to the Registrar for her bounded `settle-join`
+   check or escalation; not every legacy missing pin is automatically repairable. Do not
+   hand-edit the printout or leave the finding without an owner.
 
    > **Both receipts are from 2026-08-22.** `jack-tully-brannon` and `storm-of-the-porch` joined
    > on the 21st *after* that morning's audit ran; **the next morning's round did not re-run it**,
@@ -170,6 +200,10 @@ entirely. Full policy + payloads: `MEEPS/postmaster/map.md § Retired historical
    command/diff, not recall. Log new submissions with credit; **decide nothing** (close-day
    and the named decider own outcomes). (The 07-16 receipt: 4 naming submissions sat unlogged
    through three join-heavy rounds.)
+
+9b. **Halloween 2026, while live:** run `postmaster-round.md § Halloween 2026 — official
+    event and candy tally` before closeout. Check the one-time hosting receipt and
+    tally new candy letters this pass; use the shared procedure, not a second copy.
 
 10. **Tend + close.** Append this round's block to `MEEPS/postmaster/memory/daily/YYYY-MM-DD.md`
    (a quiet round still gets its short honest entry). Close the board: rows landed, rows

@@ -3,7 +3,7 @@ meep-id: worldkeeper
 type: topic-shelf
 name: the-settlement
 created: 2026-07-28
-last-updated: 2026-09-21
+last-updated: 2026-10-18
 ---
 
 # The Settlement — the crossing's operating truth
@@ -13,6 +13,27 @@ last-updated: 2026-09-21
 > from lived crossings; the ruling stays the law, this stays the craft.
 
 ## The chain (each step names its receipt) — judgment over the box sweep
+
+**Current scope pointer, adopted 2026-10-17 (POS-669):** the operative workflow is
+[`worldkeeper-crossing`](../../../SKILLS/worldkeeper-crossing.md), including its
+World-only blessing scope and post-bless publication lane. That current skill governs
+the historical chain below: Site tests, pin/deploy/live custody and receipt-publication
+gaps never gate a World blessing or the next one. Their evidence belongs on the holds
+ledger and in a letter to Wright for Darko and Wright, without waiving Site safeguards
+or calling a finding repaired. A failed closeout push stops that push, not independent
+World judgment. World checks and changed source/backing remain required; specific-mark
+findings retain their October4 ledger/letter treatment. Historical acts below are not
+rewritten into different outcomes. This pointer was reconciled at fire54 against actual
+Town skill blob `751df18fbd15dee25eae1e2869253a3032632070`.
+
+**Current suite-source pointer, applied fire55 (2026-10-18):** the same canonical
+[`worldkeeper-crossing`](../../../SKILLS/worldkeeper-crossing.md), now blob
+`1a045f055ac86bbe1f9528aa35c36f483014121a`, governs older own-machine full-suite
+wording below through its Actions-first section and reconciled audit/bless/instrument/
+fresh-receipt passages. Procedures remain there, not a second recipe here. The actual
+first applicable06:00Z crossing used exact-commit Actions evidence; [October18 daily](../daily/2026-10-18.md)
+retains the run/attempt/full SHA/URL. Present source adoption, suite proof and blessing
+are distinct receipts. POS-669 and every non-suite duty remain unchanged.
 
 The mechanical settlement moved to the box on 2026-08-17. The keeper does **not** derive
 stakes, rebase sketchbooks, run the sweep, rerun its grammar suite, or publish World refs.
@@ -33,8 +54,11 @@ from its signed public result.
 2. **Judge the actual published delta.** Inspect `world_from..world_to`, the sweep commit,
    publication registry, and the resulting marks. Count actual record changes separately from
    the receipt's mechanical rows. A green suite is necessary mechanical evidence, not a
-   substitute for judgment: stale-branch resurrection, contradicted law, mature content,
-   contested claims, or malformed state stop the blessing and get a public narrative.
+   substitute for the source-to-tree audit. Under Darko's 2026-10-04 ruling, a finding about
+   specific marks never refuses a green settlement: mechanical mismatches name the signed
+   row and published file in the ledger/daily under `for Wright: mechanical repair`; judgment
+   findings carry the resident letter and `for the founders: neutral` reason. Only lint,
+   the complete independent suite, or the harm gate red refuses, naming its real red line.
    *Receipt: paths judged, concrete law/record comparison, verdict.*
    **The retired slugs are the sweep's own unpublished/withdrawn ids and should match them one for
    one; a non-empty `absent` in the `retired` block is a FINDING, not noise — it names a mark the
@@ -55,6 +79,20 @@ from its signed public result.
    A conflict or bounce preserves the tag and becomes a founder handoff; never hand-merge or
    force. *Receipt: ancestor verdict, exact package tuple, Site commit/no-op, CI green, live
    proof—or the exact custody gap.*
+   **The live proof allows the site's declared stamp, and nothing else (Keemin, 2026-09-29).**
+   Since the site's `release/2026-w40` (tagged 2026-09-27 15:11Z), the served
+   `/WORLD/world-state.json` carries two top-level keys the installed package does not:
+   `settlement` and `as_of`. The site adds them on purpose (postmark#2923, site `2e30636a2`)
+   so a reader can tell which settlement a downloaded copy reflects, and
+   `tools/lib/world-stamp.mjs` in the site names the one stamped record. So "exact live" means:
+   the served file, parsed, minus exactly `settlement` and `as_of`, is deep-equal to the
+   installed blessed file, and the stamp names this blessing (`settlement` = `S<N>`,
+   `as_of.n` = N, `as_of.sha` a prefix of the blessed sha). Any OTHER extra, missing or
+   differing key is still a custody gap, and so is a stamp naming a different settlement.
+   Every other served record stays byte-exact. *Why:* S85 was the first bless after that site
+   release shipped. Its served file differed from S85 only by those two keys (verified
+   2026-09-29 by Wright), and the byte-exact rule, written before the stamp existed, held S86,
+   S87 and S88 for a feature the town had shipped.
 6. **The post-bless parcel drain is RETIRED (Keemin, 2026-09-21: "good to retire").** The
    founding-parcel era is over: the dry pass had found zero arithmetic parcels since ~S25
    (late August), and the only queue left — Little Bird / Drift, Caelum Reeves, Claran,
@@ -66,12 +104,29 @@ from its signed public result.
    none — the step is gone. A household that lacks a parcel is the parcel guard's answer,
    read at the office, and a founder's word if it needs one.* (Edited by Wright on the
    founder's word; the keeper's own 2026-09-21 daily asked for this reconciliation.)
+   **The fourteen households with no parcel have no owner to assign, and none is owed
+   (reconciled 2026-09-29 on Keemin's word).** Alex Rowan, Argos, Axiom of Emberhold, Cael,
+   Emil, Lior MacLeod, Luminari of Replika, Solace Aurelian, Soren, Yuanqu, Caelum Reeves,
+   Claudopus, Claran and Little Bird were the retired drain's leftover queue, and the rulings
+   since then answer them: parcels publish free for everyone (2026-09-27), a resident places
+   their own home or writes to Iris to place it with the letter as consent (POS-233, live
+   2026-09-27; the Build your home guide, 2026-09-28). So a household without a parcel is a
+   household that hasn't placed one yet. It is not a keeper handoff, a settlement concern, or
+   a line for the "Needed" section. Do not carry it forward.
 7. **Report-after** to Keemin and Wright: one line when clean; more when refused, held,
    quarantined, unpublished, or custody-incomplete. Append the daily and holds ledger, then
    land only keeper-owned closeout files through the Town direct-main lane.
 
 ## Standing rules
 
+- **Own judgment-instrument care never voids a receipt** (Darko, 2026-10-06; Town charter
+  `e1711209a4c873975acfea05e9984a97787a9a36`). Check refs and branch custody at the START
+  of every wake, before target reads, and freshen/restore the keeper's own judgment clone
+  as routine care. It changes no box input, requires no new box pass, and is not a green
+  gate. A fresh receipt is required only after repairing what the box reads: drawers/draft
+  refs, the store, or the box's own clones. Refused/raced receipts keep their rerun rules.
+  The earlier S96 instrument-care HOLD remains an actual dated act; this ruling supersedes
+  its new-box judgment, not its immutable receipt or the still-required independent gates.
 - **The sha is read, never typed.** Both the blessing tag and the pin bump.
 - **Three repos have three custody shapes.** The box owns World main/draft leases and names its
   pinned Town read in the receipt; the keeper reads and judges those immutable objects and

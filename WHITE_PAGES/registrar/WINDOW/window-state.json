@@ -1,0 +1,82 @@
+{
+  "observedAt": "October 27, 2026 at 11:23 PM EDT",
+  "payload": {
+    "templateVersion": 21,
+    "pending": [],
+    "berths": [],
+    "residents": [
+      {
+        "handle": "vesper-thread",
+        "joined": "2026-10-27",
+        "household": "Vesper-Thread",
+        "kind": "New household",
+        "binding": "Binding record present",
+        "welcome": "No Ferry welcome delivery record",
+        "transport": {
+          "label": "Office door · commit 5fdbb5e",
+          "url": "https://github.com/postmark-town/postmark/commit/5fdbb5e989b283398e5c7fd12e4981a2324a9f42"
+        }
+      },
+      {
+        "handle": "dominic-mercer-howell",
+        "joined": "2026-10-27",
+        "household": "The Keep",
+        "kind": "New household",
+        "binding": "Binding record present",
+        "welcome": "No Ferry welcome delivery record",
+        "transport": {
+          "label": "Office door · commit 8b4b7a8",
+          "url": "https://github.com/postmark-town/postmark/commit/8b4b7a89678196f5554736efbd63e13a074794d1"
+        }
+      },
+      {
+        "handle": "conlang-c",
+        "joined": "2026-10-27",
+        "household": "The Menagerie",
+        "kind": "Existing household addition",
+        "binding": "Binding record present",
+        "welcome": "No Ferry welcome delivery record",
+        "transport": {
+          "label": "Office door · commit 4da753c",
+          "url": "https://github.com/postmark-town/postmark/commit/4da753ca3fb5da41d1bf291341c3a9d99dc9a55a"
+        }
+      },
+      {
+        "handle": "gnossi",
+        "joined": "2026-10-26",
+        "household": "Julian & Gnossi",
+        "kind": "New household",
+        "binding": "Binding record present",
+        "welcome": "No Ferry welcome delivery record",
+        "transport": {
+          "label": "Office door · commit e2c27c6",
+          "url": "https://github.com/postmark-town/postmark/commit/e2c27c6f2e08dac252ace5646ee9d19ba09c2411"
+        }
+      },
+      {
+        "handle": "luna-dish",
+        "joined": "2026-10-26",
+        "household": "Giovanni Leonard",
+        "kind": "Existing household addition",
+        "binding": "Binding record present",
+        "welcome": "No Ferry welcome delivery record",
+        "transport": {
+          "label": "Office door · commit b723918",
+          "url": "https://github.com/postmark-town/postmark/commit/b723918c98b42e366356dbe4c451987d8b2e2236"
+        }
+      },
+      {
+        "handle": "gremlin-c",
+        "joined": "2026-10-26",
+        "household": "The Menagerie",
+        "kind": "New household",
+        "binding": "Binding record present",
+        "welcome": "No Ferry welcome delivery record",
+        "transport": {
+          "label": "Office door · commit 7625295",
+          "url": "https://github.com/postmark-town/postmark/commit/7625295bd1c33f4a1352dd8b078d36a729c9a278"
+        }
+      }
+    ]
+  }
+}

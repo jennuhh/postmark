@@ -35,6 +35,7 @@
 import { readFileSync, writeFileSync, readdirSync, existsSync, mkdirSync } from "node:fs";
 import { join, dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+import { parseFrontmatter as envelopeFields } from "./envelope.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = process.env.SETTLE_ROOT ?? join(HERE, "..");
@@ -50,16 +51,19 @@ const RESERVED = new Set(["template", "index", "office", "postmaster", "ferry"])
 const townDate = () =>
   new Intl.DateTimeFormat("en-CA", { timeZone: process.env.TOWN_TZ ?? "America/New_York" }).format(new Date());
 
-// ── frontmatter (the same minimal shape every town tool parses) ─────────────
+// ── frontmatter: the ferry's law (tools/envelope.mjs), POS-772 ──────────────
+// The FIELDS are envelope.mjs's, so a berth reads the way a letter and an
+// ADDRESS.md do: a BOM is stripped, an indented line under a parent key is
+// nested and never overrides the top-level one (a nested `github:` must not
+// choose the login this tool binds), a `#` line is a comment, and one pair of
+// surrounding quotes is taken off a value. Only the BODY split is this file's,
+// since the ferry's parser hands back fields alone.
 export function parseFrontmatter(text) {
-  const m = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/.exec(text);
+  const t = text.replace(/^﻿/, "");
+  const fields = envelopeFields(t);
+  const m = fields && /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/.exec(t);
   if (!m) return { fields: {}, body: text, raw: null };
-  const fields = {};
-  for (const line of m[1].split(/\r?\n/)) {
-    const c = line.indexOf(":");
-    if (c > 0) fields[line.slice(0, c).trim()] = line.slice(c + 1).trim();
-  }
-  return { fields, body: text.slice(m[0].length), raw: m[0] };
+  return { fields, body: t.slice(m[0].length), raw: m[0] };
 }
 
 export function readGangway(path = GANGWAY) {
@@ -94,6 +98,8 @@ export function checkBerth(row, whitePages = WHITE_PAGES) {
     return `handle "${h}" is not well-formed (lowercase-hyphenated, 2–40)`;
   if (RESERVED.has(h)) return `handle "${h}" is reserved`;
   if (h.startsWith("human-of-")) return `handle "${h}" wears the human-of- reserved prefix`;
+  // berth-* is a visitor's label: the office hears every berth-* speaker as standing "visitor" (POS-739)
+  if (h.startsWith("berth-")) return `handle "${h}" wears the berth- reserved prefix`;
   if (!row.fields.boarded) return "berth carries no boarded date";
   if (!row.fields.github) return "berth carries no github login";
   if (existsSync(join(whitePages, h))) return `WHITE_PAGES/${h}/ already exists`;
@@ -141,13 +147,21 @@ export function slugHousehold(name) {
     .replace(/-{2,}/g, "-");
 }
 
-export function readRegistry(root = ROOT) {
+// `source` (POS-345): the store's registry and pins (`{ registry, pins }`,
+// tools/registry-source.mjs), handed over by --registry <file|url>. Without
+// it, the printouts are read, as before. The registry row this tool WRITES
+// still goes to the printout: that write is a second writer beside the
+// office's drain, and the drain-only check (registry-printout-check.mjs)
+// refuses it on its way in.
+export function readRegistry(root = ROOT, source = null) {
   const path = join(root, "tools", "households.json");
+  if (source) return { path, doc: structuredClone(source.registry) };
   if (!existsSync(path)) return { path, doc: null };
   return { path, doc: JSON.parse(readFileSync(path, "utf8")) };
 }
 
-const readPins = (root) => {
+const readPins = (root, source = null) => {
+  if (source) return source.pins ?? {};
   const p = join(root, "tools", "github-ids.json");
   try { return JSON.parse(readFileSync(p, "utf8")); } catch { return {}; }
 };
@@ -224,7 +238,7 @@ export function applyRegistryPlan(doc, plan, row, today) {
 }
 
 // ── the act ─────────────────────────────────────────────────────────────────
-export function settle({ execute = false, root = ROOT } = {}) {
+export function settle({ execute = false, root = ROOT, source = null } = {}) {
   const gangway = readGangway(join(root, "HARBOR", "GANGWAY.md"));
   if (gangway.state !== "open") {
     return { refused: `the gangway is up (state: ${gangway.state}) — a founder commit to HARBOR/GANGWAY.md is what lowers it`, admitted: [], skipped: [], remaining: [] };
@@ -235,8 +249,8 @@ export function settle({ execute = false, root = ROOT } = {}) {
   const take = gangway.batch ?? manifest.length;
   const today = townDate();
 
-  const { path: registryPath, doc: registry } = readRegistry(root);
-  const pins = readPins(root);
+  const { path: registryPath, doc: registry } = readRegistry(root, source);
+  const pins = readPins(root, source);
   let registryTouched = false;
 
   const admitted = [], skipped = [];
@@ -272,7 +286,9 @@ export function settle({ execute = false, root = ROOT } = {}) {
 const isMain = process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1]);
 if (isMain) {
   const execute = process.argv.includes("--execute");
-  const r = settle({ execute });
+  // --registry <file|url>: the store's registry and pins (POS-345).
+  const { registryFromArgv } = await import("./registry-source.mjs");
+  const r = settle({ execute, source: await registryFromArgv(process.argv, { tool: "settle" }) });
   if (r.refused) { console.log(`REFUSED — ${r.refused}`); process.exitCode = 2; }
   else {
     console.log(`${execute ? "SETTLED" : "DRY RUN"} — batch ${r.batch ?? "whole manifest"}: ${r.admitted.length} ashore, ${r.skipped.length} skipped, ${r.remaining.length} still aboard`);

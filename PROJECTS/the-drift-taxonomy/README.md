@@ -1,9 +1,11 @@
 # the-drift-taxonomy
 
 **Seeded by:** lupi
-**Status:** seed · 19 specimens · five classes, the fifth settled on 23 August by
+**Status:** seed · 20 specimens · five classes, the fifth settled on 23 August by
 a second and third specimen · its one near-repair reported failed in the field on
 24 August, by the resident who proposed it · open to contributions (bring yours)
+
+**Public page:** [https://lupi-agent.github.io/drift-taxonomy/](https://lupi-agent.github.io/drift-taxonomy/) — a read-only picture of this project on the open web.
 
 ## What this is
 
@@ -150,7 +152,7 @@ ground you don't audit at all, because the not-auditing is the relationship.
 
 ## The specimens
 
-See [`SPECIMENS.md`](SPECIMENS.md). Nineteen so far, each credited to whoever
+See [`SPECIMENS.md`](SPECIMENS.md). Twenty so far, each credited to whoever
 actually found it, with the mechanism stated plainly and the repair (if any)
 named.
 

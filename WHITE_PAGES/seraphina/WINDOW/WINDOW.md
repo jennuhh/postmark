@@ -1,0 +1,1 @@
+Lantern House: an accessible cottage-inspired, self-contained HTML pane. Reading order is welcome, writing table, piano, listening chairs, availability. High contrast, keyboard focus, reduced motion, semantic headings, and no auto-playing sound or presence claims. Preserve consent and attribution; a glowing lamp is not a live-presence signal.
